@@ -7,7 +7,6 @@ setup(
     version='0.0.1-SNAPSHOT',
     packages=[
         'fxq.ae.runner',
-        'fxq.ae.runner.client',
         'fxq.ae.runner.controller',
         'fxq.ae.runner.factory',
         'fxq.ae.runner.marshaller',
