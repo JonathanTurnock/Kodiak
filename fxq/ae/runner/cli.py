@@ -5,8 +5,8 @@ from fxq.core.beans.factory.annotation import Autowired
 from fxq.ae.runner.factory import ExecutorFactory
 from fxq.ae.runner.service import PipelineService, ExecutorService
 
-format = "[%(asctime)s] [%(levelname)s] [%(name)s] - %(message)s"
-logging.basicConfig(format=format, level=logging.INFO)
+fmt = "[%(asctime)s] [%(levelname)s] [%(name)s] - %(message)s"
+logging.basicConfig(format=fmt, level=logging.INFO)
 
 __executor_service: ExecutorService = Autowired(type=ExecutorService)
 __pipeline_service: PipelineService = Autowired(type=PipelineService)
