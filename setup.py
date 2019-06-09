@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='fxq-ae-runner',
-    version='0.0.3-SNAPSHOT',
+    version='0.0.4-SNAPSHOT',
     packages=[
         'fxq.ae.runner',
         'fxq.ae.runner.factory',
