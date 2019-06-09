@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from fxq.ae.runner.model import Command
 from fxq.ae.runner.model.PipelineStatus import PipelineStatus
@@ -13,16 +14,19 @@ class Step:
         self.image = image
         self._status = status
         self.commit_changes = commit_changes
-        self.script = []
+        self.script: List[Command] = []
 
     def __repr__(self):
-        return str({
+        return str(self.__json__())
+
+    def __json__(self):
+        return {
             'name': self.name,
             'image': self.image,
             'status': self.status.name,
             'commit_changes': self.commit_changes,
-            'script': self.script
-        })
+            'script': [s.__json__() for s in self.script]
+        }
 
     @property
     def status(self):
@@ -31,7 +35,7 @@ class Step:
     @status.setter
     def status(self, status):
         self._status = status
-        LOGGER.debug("CALLBACK:%s" % self)
+        print("CALLBACK:%s" % self)
 
     def add_script_command(self, command: Command):
         self.script.append(command)

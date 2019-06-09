@@ -7,10 +7,8 @@ setup(
     version='0.0.5-SNAPSHOT',
     packages=[
         'fxq.ae.runner',
-        'fxq.ae.runner.factory',
         'fxq.ae.runner.marshaller',
         'fxq.ae.runner.model',
-        'fxq.ae.runner.repository',
         'fxq.ae.runner.service',
     ],
     url='https://bitbucket.org/fxquants/ae-runner/',
@@ -21,13 +19,11 @@ setup(
     long_description=(pathlib.Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
     install_requires=[
-        'Flask',
-        'PyYAML',
-        'GitPython',
-        'fxq-core',
-        'fxqwebcore',
         'docker',
-        'click'
+        'flask',
+        'fxq.core',
+        'gitpython',
+        'pyyaml'
     ],
     entry_points={
         'console_scripts': ['fxq-ae-runner=fxq.ae.runner.cli:main'],

@@ -5,7 +5,6 @@ from fxq.core.stereotype import Service
 
 from fxq.ae.runner.model import Pipeline
 from fxq.ae.runner.model.PipelineStatus import PipelineStatus
-from fxq.ae.runner.repository import PipelineRepository
 from fxq.ae.runner.service import DockerService
 
 LOGGER = logging.getLogger(__name__)
@@ -15,15 +14,8 @@ LOGGER = logging.getLogger(__name__)
 class PipelineService:
 
     @Autowired
-    def __init__(self, docker_service: DockerService, pipeline_repository: PipelineRepository):
+    def __init__(self, docker_service: DockerService):
         self._docker_service = docker_service
-        self._pipeline_repository = pipeline_repository
-
-    def find_all(self):
-        return self._pipeline_repository.find_all()
-
-    def find_by_id(self, pipeline_id):
-        return self._pipeline_repository.find_by_id(pipeline_id)
 
     def start(self, pipeline: Pipeline, workspace_path: str):
         LOGGER.info("Executing Pipeline %s" % pipeline.name)
@@ -33,7 +25,7 @@ class PipelineService:
                 LOGGER.info("Running step %s" % step.name)
                 step.status = PipelineStatus.IN_PROGRESS
                 container = self._docker_service.provision(
-                    "%s-%s" % (pipeline.name, step.name),
+                    pipeline.run_id,
                     step.image,
                     workspace_path
                 )

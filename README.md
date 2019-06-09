@@ -1,25 +1,47 @@
 # FX Quants Analytics Engine Runner
 
-The Analytics engine runner is a python flask application, it exposes an API and connects to the local docker environment
-to allow scheduling of and execution of an fxq-pipeline.
+The Analytics engine runner is a Flask application which is designed to run on a docker host orchestrating pipelines.
+It has a single API endpoint ```/api/request``` which takes a POST. The JSON body must contain a url which is a git repo.
+This git repo will be checked out, executed and the container will be removed once done.
+
+TBC is a callback to report the status of the pipeline as it occurs.
 
 ## Getting Started
 The first thing that is needed is a Git repository with an fxq-pipeline.yml file present.
 See the following example [hello world](https://bitbucket.org/fxquants/aep-hello-world)
 
 ## Installing
-I Highly recommend using PIPX to install the FXQuants Runner to ensure you do not run into issues with other environments and CLI apps installed using PIP 
+I Highly recommend using PIPX to install the FXQuants Runner if installed locally to ensure you do not run into issues 
+with other environments and CLI apps installed using PIP 
 https://packaging.python.org/guides/installing-stand-alone-command-line-tools/
 
 ```
 pipx install fxq-ae-runner
 ```
 
+However I highly recommend using the official docker image for this and running the container with the Docker socket
+passed into it. 
+```
+docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name fxquants/ae-runner:latest
+``` 
+
 ## Usage
-Simply start the application via the command line
+Simply post a request to the endpoint with the URL in the post body, you will see the request be carried out by the runner.
+```
+Request:
+curl -d '{"url":"https://bitbucket.org/fxquants/aep-hello-world.git"}' -H "Content-Type: application/json" -X POST http://localhost:5000/api/request
+
+Response:
+{"commit_changes":false,"name":"fxquants-aep-hello-world","run_id":"d011cb4f-40e5-4ce3-9ccd-bd23cca3ba23","status":"IN_PROGRESS","steps":[{"commit_changes":false,"image":"alpine","name":"Hello World With Bash","script":[{"instruction":"echo Hello World","output":[]}],"status":"PENDING"}]}
+```
+
+Make sure to use Https for open repos so that you dont need to add authentication.
+
+Alternatively with private repos you can provide an ssh based url but this will take additional setup.
+Exec into the container using SSH, Generate an SSH Key and Exchange Keys with your Git service provider.
 
 ```
-fxq-ae-runner
+curl -d '{"url":"git@bitbucket.org:fxquants/aep-hello-world.git"}' -H "Content-Type: application/json" -X POST http://localhost:5000/api/request
 ```
 
 ## Contributing

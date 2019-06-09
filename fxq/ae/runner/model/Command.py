@@ -10,10 +10,13 @@ class Command:
 
     def append_output(self, output):
         self.output.append(output)
-        LOGGER.debug("CALLBACK:%s" % self)
+        print("CALLBACK:%s" % self)
 
     def __repr__(self):
-        return str({
+        return str(self.__json__())
+
+    def __json__(self):
+        return {
             'instruction': self.instruction,
-            'output': self.output
-        })
+            'output': [str(o) for o in self.output]
+        }

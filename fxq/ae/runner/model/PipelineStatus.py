@@ -8,3 +8,6 @@ class PipelineStatus(Enum):
     IN_PROGRESS = 4
     PAUSED = 5
     STOPPED = 6
+
+    def __json__(self):
+        return self.name
