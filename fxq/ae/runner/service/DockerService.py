@@ -19,6 +19,7 @@ class DockerService:
 
     def provision(self, name: str, image: str, workspace_path: str = None) -> Container:
         name = name.replace(" ", "_")
+        image = image if ":" in image else image + ":latest"
         LOGGER.info("Pulling Container Image %s" % image)
         self._docker_client.images.pull(image)
         LOGGER.info("Provisioning Container \"%s\" with Image:\"%s\"" % (name, image))
