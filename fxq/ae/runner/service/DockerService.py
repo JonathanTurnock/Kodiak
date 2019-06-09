@@ -19,12 +19,14 @@ class DockerService:
 
     def provision(self, name: str, image: str, workspace_path: str = None) -> Container:
         name = name.replace(" ", "_")
+        LOGGER.info("Provisioning Container \"%s\" with Image:\"%s\"" % (name, image))
         if workspace_path is None:
             return self._provision_without_volume(name, image)
         else:
             return self._provision_with_volume(name, image, workspace_path)
 
     def run_command(self, container: Container, command: Command) -> Command:
+        LOGGER.info("Running Container Command \"%s\"" % command.instruction)
         response = container.exec_run(
             ["/bin/sh", "-c", command.instruction],
             privileged=True,

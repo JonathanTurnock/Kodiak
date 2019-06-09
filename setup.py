@@ -26,7 +26,8 @@ setup(
         'GitPython',
         'fxq-core',
         'fxqwebcore',
-        'docker'
+        'docker',
+        'click'
     ],
     entry_points={
         'console_scripts': ['fxq-ae-runner=fxq.ae.runner.cli:main'],

@@ -10,7 +10,7 @@ class Command:
 
     def append_output(self, output):
         self.output.append(output)
-        LOGGER.info(self)
+        LOGGER.debug("CALLBACK:%s" % self)
 
     def __repr__(self):
         return str({

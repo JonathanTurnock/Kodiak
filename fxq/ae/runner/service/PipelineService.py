@@ -28,6 +28,7 @@ class PipelineService:
     def start(self, pipeline: Pipeline, workspace_path: str):
         LOGGER.info("Executing Pipeline %s" % pipeline.name)
         for step in pipeline.steps:
+            container = None
             try:
                 LOGGER.info("Running step %s" % step.name)
                 step.status = PipelineStatus.IN_PROGRESS
@@ -41,11 +42,13 @@ class PipelineService:
                     self._docker_service.run_command(container, command)
 
                 step.status = PipelineStatus.SUCCESSFUL
-            except Exception:
+            except Exception as e:
+                LOGGER.error("Error occurred during pipeline", e)
                 step.status = PipelineStatus.FAILED
             finally:
                 LOGGER.debug("Starting Pipeline Teardown")
-                self._docker_service.teardown(container)
+                if container is not None:
+                    self._docker_service.teardown(container)
 
             LOGGER.info("Completed running step %s" % step.name)
 

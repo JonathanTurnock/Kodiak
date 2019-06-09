@@ -31,7 +31,7 @@ class Step:
     @status.setter
     def status(self, status):
         self._status = status
-        LOGGER.info(self)
+        LOGGER.debug("CALLBACK:%s" % self)
 
     def add_script_command(self, command: Command):
         self.script.append(command)

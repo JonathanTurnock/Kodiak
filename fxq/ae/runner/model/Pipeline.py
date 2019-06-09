@@ -31,7 +31,7 @@ class Pipeline:
     @status.setter
     def status(self, status):
         self._status = status
-        LOGGER.info(self)
+        LOGGER.debug("CALLBACK:%s" % self)
 
     def add_step(self, step: Step):
         self.steps.append(step)
