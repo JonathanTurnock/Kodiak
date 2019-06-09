@@ -19,6 +19,8 @@ class DockerService:
 
     def provision(self, name: str, image: str, workspace_path: str = None) -> Container:
         name = name.replace(" ", "_")
+        LOGGER.info("Pulling Container Image %s" % image)
+        self._docker_client.images.pull(image)
         LOGGER.info("Provisioning Container \"%s\" with Image:\"%s\"" % (name, image))
         if workspace_path is None:
             return self._provision_without_volume(name, image)
