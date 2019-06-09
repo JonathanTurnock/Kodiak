@@ -1,5 +1,6 @@
 import logging
 
+import click
 from fxq.core.beans.factory.annotation import Autowired
 
 from fxq.ae.runner.factory import ExecutorFactory
@@ -13,6 +14,9 @@ __pipeline_service: PipelineService = Autowired(type=PipelineService)
 __factory: ExecutorFactory = Autowired(type=ExecutorFactory)
 
 
+@click.command()
+@click.option('--url', '-u', required=True, multiple=False,
+              help="Provide the URL of the git repository to configure pipeline from")
 def main(url: str):
     executor = __factory.from_url(url)
     __executor_service.save(executor)
@@ -20,5 +24,4 @@ def main(url: str):
 
 
 if __name__ == '__main__':
-    url = "git@bitbucket.org:fxquants/aep-hello-world.git"
-    main(url)
+    main()
