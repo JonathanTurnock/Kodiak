@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='fxq-ae-runner',
-    version='0.0.6-SNAPSHOT',
+    version='0.0.6',
     packages=[
         'fxq.ae.runner',
         'fxq.ae.runner.marshaller',
