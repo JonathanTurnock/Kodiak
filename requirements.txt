@@ -4,4 +4,4 @@ flask
 fxq-core
 gitpython
 pyyaml
-xmlrunner
+unittest-xml-reporting
