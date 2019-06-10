@@ -4,3 +4,4 @@ flask
 fxq-core
 gitpython
 pyyaml
+xmlrunner
