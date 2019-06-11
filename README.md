@@ -2,15 +2,22 @@
 
 The Analytics engine runner is a Flask application which is designed to run on a docker host orchestrating pipelines.
 It has a single API endpoint ```/api/request``` which takes a POST. The JSON body must contain a url which is a git repo.
-This git repo will be checked out, executed and the container will be removed once done.
+This git repo will be checked out, executed and the created container will be removed once done.
 
-TBC is a callback to report the status of the pipeline as it occurs.
+TBC is a callback to report the status of the pipeline as it occurs. Tailing the container logs you can see references as below, this can be extracted as required until the callback is implemented.
+CALLBACK:{'run_id': '11922057-0b72-4bc3-baca-6c40e0bedbec', 'name': 'fxquants-aep-hello-world', 'status': 'SUCCESSFUL', 'commit_changes': False, 'steps': [{'name': 'Hello World With Bash', 'image': 'alpine', 'status': 'SUCCESSFUL', 'commit_changes': False, 'script': [{'instruction': 'echo Hello World', 'output': ['Hello World\r\n']}]}]}
 
 ## Getting Started
 The first thing that is needed is a Git repository with an fxq-pipeline.yml file present.
 See the following example [hello world](https://bitbucket.org/fxquants/aep-hello-world)
 
 ## Installing
+However I highly recommend using the official docker image for this and running the container with the Docker socket
+passed into it. 
+```
+docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
+``` 
+Alternatively it can be run as a standalone application on the host itself.
 I Highly recommend using PIPX to install the FXQuants Runner if installed locally to ensure you do not run into issues 
 with other environments and CLI apps installed using PIP 
 https://packaging.python.org/guides/installing-stand-alone-command-line-tools/
@@ -18,13 +25,6 @@ https://packaging.python.org/guides/installing-stand-alone-command-line-tools/
 ```
 pipx install fxq-ae-runner
 ```
-
-However I highly recommend using the official docker image for this and running the container with the Docker socket
-passed into it. 
-```
-docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
-``` 
-
 ## Usage
 Simply post a request to the endpoint with the URL in the post body, you will see the request be carried out by the runner.
 ```
