@@ -59,6 +59,16 @@ https://packaging.python.org/guides/installing-stand-alone-command-line-tools/
 ```
 pipx install fxq-ae-runner
 ```
+
+The standard CLI version is only a development server. I would't use this in production but it may also be fine for
+most people. The Docker image version runs the application using Gunicorn and is the only supported production mode.
+To run it yourself using Gunicorn perform the following once installed using pip.   
+NOTE: It goes without saying if you use pipx to install the fxq-ae-runner, that install is in an isolated venv so you need to get gunicorn installed into that environment.
+```
+pip install gunicorn
+gunicorn --bind 0.0.0.0:5000 fxq.ae.runner.wsgi --log-level info
+```
+
 ## Usage
 Simply post a request to the endpoint with the URL in the post body, you will see the request be carried out by the runner.
 ```
