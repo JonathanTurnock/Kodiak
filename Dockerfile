@@ -6,9 +6,10 @@ ENV WORKERS 5
 ENV THREADS 2
 
 COPY . /opt/fxq/ae-runner
+COPY entrypoint.sh /
 
 RUN pip install gunicorn && pip install /opt/fxq/ae-runner
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 --workers ${WORKERS} --threads=${THREADS} fxq.ae.runner.wsgi --log-level ${LOG_LEVEL}"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]
