@@ -11,14 +11,6 @@ pipelines:
             - python -m xmlrunner discover tests/ -o build/test-reports
             - python setup.py sdist bdist_wheel
       - step:
-          name: Release
-          trigger: manual
-          script:
-            - pip install bumpversion
-            - bumpversion snapshot --tag
-            - bumpversion patch
-            - git push origin master --tags
-      - step:
           name: Build Snapshot image and Deploy to Dockerhub
           deployment: test
           trigger: manual
@@ -33,6 +25,14 @@ pipelines:
             - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             - docker push $VERSIONED_IMAGE_NAME
             - docker push $LATEST_IMAGE_NAME
+      - step:
+          name: Release
+          trigger: manual
+          script:
+            - pip install bumpversion
+            - bumpversion snapshot --tag
+            - bumpversion patch
+            - git push origin master --tags
   tags:
     '*':
       - step:
