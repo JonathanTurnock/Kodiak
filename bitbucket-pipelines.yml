@@ -4,6 +4,7 @@ pipelines:
   branches:
     master:
       - step:
+          name: Build Dist
           caches:
             - pip
           script:
@@ -36,6 +37,7 @@ pipelines:
   tags:
     '*':
       - step:
+          name: Publish to PyPi
           caches:
             - pip
           script:
