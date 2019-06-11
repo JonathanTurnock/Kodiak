@@ -54,7 +54,7 @@ When running the image a gunicorn config with defaults is loaded by the gunicorn
 See Gunicorn Documentation for further information on these Variables:   
 http://docs.gunicorn.org/en/stable/settings.html
 ```
-docker run -p 5000:5000 -e LOG_LEVEL=info -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
+docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
 ``` 
 Alternatively it can be run as a standalone application on the host itself.
 I Highly recommend using PIPX to install the FXQuants Runner if installed locally to ensure you do not run into issues 
