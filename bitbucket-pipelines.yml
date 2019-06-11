@@ -55,7 +55,7 @@ pipelines:
           script:
             - export PROJECT_VERSION=$(grep 'version=' setup.py | tr -d " |'|version=|,")
             - export VERSIONED_IMAGE_NAME=fxquants/ae-runner:$PROJECT_VERSION
-            - export LATEST_IMAGE_NAME=fxquants/ae-runner:latestSnapshot
+            - export LATEST_IMAGE_NAME=fxquants/ae-runner:latest
             - echo "Building Docker image for ae_runner $PROJECT_VERSION"
             - docker build -t $VERSIONED_IMAGE_NAME -t $LATEST_IMAGE_NAME .
             - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
