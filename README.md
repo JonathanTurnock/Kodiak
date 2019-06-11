@@ -46,10 +46,16 @@ The first thing that is needed is a Git repository with an fxq-pipeline.yml file
 See the following example [hello world](https://bitbucket.org/fxquants/aep-hello-world)
 
 ## Installing
-However I highly recommend using the official docker image for this and running the container with the Docker socket
-passed into it. 
+I highly recommend using the official docker image for this and running the container with the Docker socket
+passed into it. The Following environment variables are passed onto the Gunicorn server and can override the defaults
+* **LOG_LEVEL**:info - Defines the Log level, set to info by default
+* **WORKERS**:5 - Defines the number of workers, set to 5 by default. (Number of cores * 2 + 1) 
+* **THREADS**:2 - Defines the number of threads, set to 2 by default.
+
+See Gunicorn Documentation for further information on these Variables:
+http://docs.gunicorn.org/en/stable/design.html
 ```
-docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
+docker run -p 5000:5000 -e LOG_LEVEL=info -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
 ``` 
 Alternatively it can be run as a standalone application on the host itself.
 I Highly recommend using PIPX to install the FXQuants Runner if installed locally to ensure you do not run into issues 
