@@ -1,11 +1,45 @@
 # FX Quants Analytics Engine Runner
 
-The Analytics engine runner is a Flask application which is designed to run on a docker host orchestrating pipelines.
+The Analytics engine runner is a Flask application which is designed to run on a docker host.
+Its purpose is to Take a request from a Strategy Scheduler and run it using the following technique:
+1. Receive GIT URL 
+2. Clone GIT repo
+3. Parse GIT repo YML
+4. Extract Image
+5. Create Image and keep it alive
+4. Execute commands in container and capture STDOUT
+5. Stream STDOUT to the Callback (back to the scheduler)
+6. Stop container when all commands are finished and all processes stopped.
+7. Delete the container.
+
 It has a single API endpoint ```/api/request``` which takes a POST. The JSON body must contain a url which is a git repo.
 This git repo will be checked out, executed and the created container will be removed once done.
 
 TBC is a callback to report the status of the pipeline as it occurs. Tailing the container logs you can see references as below, this can be extracted as required until the callback is implemented.
-CALLBACK:{'run_id': '11922057-0b72-4bc3-baca-6c40e0bedbec', 'name': 'fxquants-aep-hello-world', 'status': 'SUCCESSFUL', 'commit_changes': False, 'steps': [{'name': 'Hello World With Bash', 'image': 'alpine', 'status': 'SUCCESSFUL', 'commit_changes': False, 'script': [{'instruction': 'echo Hello World', 'output': ['Hello World\r\n']}]}]}
+```
+CALLBACK:{  
+   'run_id':'11922057-0b72-4bc3-baca-6c40e0bedbec',
+   'name':'fxquants-aep-hello-world',
+   'status':'SUCCESSFUL',
+   'commit_changes':False,
+   'steps':[  
+      {  
+         'name':'Hello World With Bash',
+         'image':'alpine',
+         'status':'SUCCESSFUL',
+         'commit_changes':False,
+         'script':[  
+            {  
+               'instruction':'echo Hello World',
+               'output':[  
+                  'Hello World\r\n'
+               ]
+            }
+         ]
+      }
+   ]
+}
+```
 
 ## Getting Started
 The first thing that is needed is a Git repository with an fxq-pipeline.yml file present.
