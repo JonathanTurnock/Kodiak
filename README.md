@@ -47,13 +47,12 @@ See the following example [hello world](https://bitbucket.org/fxquants/aep-hello
 
 ## Installing
 I highly recommend using the official docker image for this and running the container with the Docker socket
-passed into it. The Following environment variables are passed onto the Gunicorn server and can override the defaults
-* **LOG_LEVEL**:info - Defines the Log level, set to info by default
-* **WORKERS**:5 - Defines the number of workers, set to 5 by default. (Number of cores * 2 + 1) 
-* **THREADS**:2 - Defines the number of threads, set to 2 by default.
+passed into it.
 
-See Gunicorn Documentation for further information on these Variables:
-http://docs.gunicorn.org/en/stable/design.html
+When running the image a gunicorn config with defaults is loaded by the gunicorn cli, its pulled from ```/etc/fxq/ae-runner/gunnicorn.py```
+ simply replace this file at runtime to provide custom config.
+See Gunicorn Documentation for further information on these Variables:   
+http://docs.gunicorn.org/en/stable/settings.html
 ```
 docker run -p 5000:5000 -e LOG_LEVEL=info -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
 ``` 
