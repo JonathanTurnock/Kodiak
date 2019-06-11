@@ -22,7 +22,7 @@ pipx install fxq-ae-runner
 However I highly recommend using the official docker image for this and running the container with the Docker socket
 passed into it. 
 ```
-docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name fxquants/ae-runner:latest
+docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock --name ae-runner fxquants/ae-runner:latest
 ``` 
 
 ## Usage
