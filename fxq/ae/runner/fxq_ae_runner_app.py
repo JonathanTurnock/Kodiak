@@ -11,4 +11,8 @@ request_service = Autowired(type=RequestService)
 
 @app.route('/api/request', methods=['POST'])
 def start():
-    return jsonify(request_service.process_request(Request.of_url(request.json["url"])).__json__())
+    return jsonify(
+        request_service.process_request(
+            Request.of_url(request.json["url"])
+        ).__json__()
+    )
