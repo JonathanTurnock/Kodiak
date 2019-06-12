@@ -44,14 +44,13 @@ class Pipeline:
     def status(self, status):
         self._status = status
         print("CALLBACK:%s" % self)
-        if os.environ["PIPELINE_CALLBACK_URL"]:
-            try:
-                requests.post(os.environ["PIPELINE_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
-            except KeyError as e:
-                LOGGER.warning("No Pipeline callback url defined. Set PIPELINE_CALLBACK_URL as an environment variable to enable"
-                            " the callback functionality for pipelines.")
-            except Exception as e:
-                LOGGER.error("Callback failed with error", e)
+        try:
+            requests.post(os.environ["PIPELINE_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
+        except KeyError as e:
+            LOGGER.warning("No Pipeline callback url defined. Set PIPELINE_CALLBACK_URL as an environment variable to enable"
+                        " the callback functionality for pipelines.")
+        except Exception as e:
+            LOGGER.error("Callback failed with error", e)
 
     def add_step(self, step: Step):
         self.steps.append(step)

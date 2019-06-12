@@ -26,14 +26,13 @@ class Command:
     def append_output(self, output):
         self.output.append(output)
         print("CALLBACK:%s" % self)
-        if os.environ["CMD_CALLBACK_URL"]:
-            try:
-                requests.post(os.environ["CMD_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
-            except KeyError as e:
-                LOGGER.warning("No Command callback url defined. Set CMD_CALLBACK_URL as an environment variable to enable"
-                            " the callback functionality for commands.")
-            except Exception as e:
-                LOGGER.error("Callback failed with error", e)
+        try:
+            requests.post(os.environ["CMD_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
+        except KeyError as e:
+            LOGGER.warning("No Command callback url defined. Set CMD_CALLBACK_URL as an environment variable to enable"
+                        " the callback functionality for commands.")
+        except Exception as e:
+            LOGGER.error("Callback failed with error", e)
 
     def __repr__(self):
         return str(self.__json__())

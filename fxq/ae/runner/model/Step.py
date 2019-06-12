@@ -55,14 +55,13 @@ class Step:
     def status(self, status):
         self._status = status
         print("CALLBACK:%s" % self)
-        if os.environ["STEP_CALLBACK_URL"]:
-            try:
-                requests.post(os.environ["STEP_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
-            except KeyError as e:
-                LOGGER.warning("No Step callback url defined. Set STEP_CALLBACK_URL as an environment variable to enable"
-                            " the callback functionality for steps.")
-            except Exception as e:
-                LOGGER.error("Callback failed with error", e)
+        try:
+            requests.post(os.environ["STEP_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
+        except KeyError as e:
+            LOGGER.warning("No Step callback url defined. Set STEP_CALLBACK_URL as an environment variable to enable"
+                        " the callback functionality for steps.")
+        except Exception as e:
+            LOGGER.error("Callback failed with error", e)
 
     def add_script_command(self, command: Command):
         self.script.append(command)
