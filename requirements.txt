@@ -4,4 +4,5 @@ flask
 fxq-core
 gitpython
 pyyaml
+requests
 unittest-xml-reporting

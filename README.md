@@ -1,43 +1,61 @@
 # FX Quants Analytics Engine Runner
 
 The Analytics engine runner is a Flask application which is designed to run on a docker host.
-Its purpose is to Take a request from a Strategy Scheduler and run it using the following technique:
-1. Receive GIT URL 
-2. Clone GIT repo
-3. Parse GIT repo YML
-4. Extract Image
-5. Create Image and keep it alive
-4. Execute commands in container and capture STDOUT
-5. Stream STDOUT to the Callback (back to the scheduler)
-6. Stop container when all commands are finished and all processes stopped.
-7. Delete the container.
-
+Its purpose is to take a request from a Strategy Scheduler and run it using the following technique:   
+1. Receive GIT URL    
+2. Clone GIT repo   
+3. Parse GIT repo YML   
+4. Extract Image   
+5. Create Image and keep it alive   
+4. Execute commands in container and capture STDOUT   
+5. Stream STDOUT to the Callback (back to the scheduler)   
+6. Stop container when all commands are finished and all processes stopped.   
+7. Delete the container.   
+   
 It has a single API endpoint ```/api/request``` which takes a POST. The JSON body must contain a url which is a git repo.
 This git repo will be checked out, executed and the created container will be removed once done.
 
-TBC is a callback to report the status of the pipeline as it occurs. Tailing the container logs you can see references as below, this can be extracted as required until the callback is implemented.
+To enable the callback functionality to update a persistent store with the results of the pipeline define the following endpoints as environment variables.
+All URL's must be Fully Qualified API endpoints built to digest the JSON.
 ```
-CALLBACK:{  
-   'run_id':'11922057-0b72-4bc3-baca-6c40e0bedbec',
-   'name':'fxquants-aep-hello-world',
-   'status':'SUCCESSFUL',
-   'commit_changes':False,
-   'steps':[  
-      {  
-         'name':'Hello World With Bash',
-         'image':'alpine',
-         'status':'SUCCESSFUL',
-         'commit_changes':False,
-         'script':[  
-            {  
-               'instruction':'echo Hello World',
-               'output':[  
-                  'Hello World\r\n'
-               ]
-            }
-         ]
-      }
-   ]
+PIPELINE_CALLBACK_URL - Takes a main pipeline json object 
+STEP_CALLBACK_URL - Takes a step json object
+CMD_CALLBACK_URL - Takes a cmd json object
+```
+You can take, the top level (pipelines) and only update on major changes.   
+The mid level (pipeline & step) and only update on step changes.
+The lowest level (pipeline, step & cmd) and update as each and every output is received.
+
+All models above contain the models below. So you can always get all of the detail, just less frequently, 
+i.e. if you dont need the results until the step, or even entire pipeline is finished dont make a cmd/step endpoint.
+```
+{
+  'run_id': '459d6f9d-bf79-4bcf-b840-f7c3c4fe9362',
+  'name': 'fxquants-aep-hello-world',
+  'status': 'SUCCESSFUL',
+  'commit_changes': False,
+  'steps': [
+    {
+      'step_id': 'd51cb24e-e993-4eb3-8c2d-00f55d87b9f0',
+      'run_id': '459d6f9d-bf79-4bcf-b840-f7c3c4fe9362',
+      'step_no': 1,
+      'name': 'Hello World With Bash',
+      'image': 'alpine',
+      'status': 'SUCCESSFUL',
+      'commit_changes': False,
+      'script': [
+        {
+          'cmd_id': '05a8964d-b8c8-4614-84a2-78490cca5eef',
+          'step_id': 'd51cb24e-e993-4eb3-8c2d-00f55d87b9f0',
+          'cmd_no': 1,
+          'instruction': 'echo Hello World',
+          'output': [
+            'Hello World\r\n'
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 

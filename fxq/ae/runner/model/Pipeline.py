@@ -1,9 +1,13 @@
+import json
 import logging
+import os
 import uuid
 from typing import List
 
+import requests
 import yaml
 
+from fxq.ae.runner.constants import JSON_HEADERS
 from fxq.ae.runner.model.Command import Command
 from fxq.ae.runner.model.PipelineStatus import PipelineStatus
 from fxq.ae.runner.model.Step import Step
@@ -40,6 +44,13 @@ class Pipeline:
     def status(self, status):
         self._status = status
         print("CALLBACK:%s" % self)
+        try:
+            requests.post(os.environ["PIPELINE_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
+        except KeyError as e:
+            LOGGER.warning("No Pipeline callback url defined. Set PIPELINE_CALLBACK_URL as an environment variable to enable"
+                        " the callback functionality for pipelines.")
+        except Exception as e:
+            LOGGER.error("Callback failed with error", e)
 
     def add_step(self, step: Step):
         self.steps.append(step)
@@ -49,10 +60,14 @@ class Pipeline:
         with open(yml_path) as ymlf:
             pipeline_dict = yaml.load(ymlf, Loader=yaml.SafeLoader)
             pipeline = Pipeline(name)
+            s_no = 0
             for s in pipeline_dict["pipelines"]["steps"]:
-                step = Step(s["step"]["name"], s["step"]["image"])
+                s_no += 1
+                step = Step(pipeline.run_id, s_no, s["step"]["name"], s["step"]["image"])
+                se_no = 0
                 for se in s["step"]["script"]:
-                    command = Command(se)
+                    se_no += 1
+                    command = Command(step.step_id, se_no, se)
                     step.add_script_command(command)
 
                 pipeline.add_step(step)
