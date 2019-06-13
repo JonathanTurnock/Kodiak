@@ -14,27 +14,49 @@ from fxq.ae.runner.model.Step import Step
 
 LOGGER = logging.getLogger(__name__)
 
+try:
+    callback_url = os.environ["PIPELINE_CALLBACK_URL"]
+except KeyError:
+    callback_url = None
+
 
 class Pipeline:
-    def __init__(self, name: str, status: PipelineStatus = PipelineStatus.PENDING,
-                 commit_changes: bool = False):
-        self.run_id = str(uuid.uuid4())
+    def __init__(
+            self,
+            name: str,
+            status: PipelineStatus = PipelineStatus.PENDING,
+            commit_changes: bool = False
+    ):
         self.name = name
+        self.run_uuid = str(uuid.uuid4())
         self._status = status
         self.commit_changes = commit_changes
         self.steps: List[Step] = []
+        self.link = self._get_callback_link() if callback_url else None
+        self.id = self._get_id()
 
     def __repr__(self):
         return str(self.__json__())
 
     def __json__(self):
         return {
-            'run_id': self.run_id,
             'name': self.name,
             'status': self.status.__json__(),
-            'commit_changes': self.commit_changes,
+            'commit': self.commit_changes,
             'steps': [s.__json__() for s in self.steps]
         }
+
+    def _get_id(self):
+        if callback_url is not None:
+            return self.link.split("/")[-1]
+        else:
+            return str(uuid.uuid4())
+
+    def _get_callback_link(self):
+        return requests.post(
+            "%s" % callback_url,
+            data=json.dumps(self.__json__()),
+            headers=JSON_HEADERS).json()["_links"]["self"]["href"]
 
     @property
     def status(self):
@@ -44,13 +66,14 @@ class Pipeline:
     def status(self, status):
         self._status = status
         print("CALLBACK:%s" % self)
-        try:
-            requests.post(os.environ["PIPELINE_CALLBACK_URL"], data=json.dumps(self.__json__()), headers=JSON_HEADERS)
-        except KeyError as e:
-            LOGGER.warning("No Pipeline callback url defined. Set PIPELINE_CALLBACK_URL as an environment variable to enable"
-                        " the callback functionality for pipelines.")
-        except Exception as e:
-            LOGGER.error("Callback failed with error", e)
+        if callback_url is not None:
+            try:
+                requests.patch(
+                    self.link,
+                    data=json.dumps(self.__json__()),
+                    headers=JSON_HEADERS)
+            except Exception as e:
+                LOGGER.error("Callback failed with error", e)
 
     def add_step(self, step: Step):
         self.steps.append(step)
@@ -63,11 +86,11 @@ class Pipeline:
             s_no = 0
             for s in pipeline_dict["pipelines"]["steps"]:
                 s_no += 1
-                step = Step(pipeline.run_id, s_no, s["step"]["name"], s["step"]["image"])
+                step = Step(pipeline, s_no, s["step"]["name"], s["step"]["image"])
                 se_no = 0
                 for se in s["step"]["script"]:
                     se_no += 1
-                    command = Command(step.step_id, se_no, se)
+                    command = Command(step, se_no, se)
                     step.add_script_command(command)
 
                 pipeline.add_step(step)

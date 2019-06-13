@@ -40,12 +40,12 @@ class RequestService:
         return pipeline
 
     def run(self, pipeline: Pipeline, workspace_path: str):
-        LOGGER.info("Starting a new Pipeline Thread for pipeline run id %s" % pipeline.run_id)
+        LOGGER.info("Starting a new Pipeline Thread for pipeline run id %s" % pipeline.run_uuid)
         pipeline.status = PipelineStatus.IN_PROGRESS
         self.pipeline_service.start(pipeline, workspace_path)
         pipeline.status = PipelineStatus.SUCCESSFUL
         shutil.rmtree(workspace_path)
-        LOGGER.info("Finishing Pipeline Thread for pipeline run id %s" % pipeline.run_id)
+        LOGGER.info("Finishing Pipeline Thread for pipeline run id %s" % pipeline.run_uuid)
 
     @staticmethod
     def _get_workspace_path(owner, name) -> str:

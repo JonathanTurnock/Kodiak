@@ -25,7 +25,7 @@ class PipelineService:
                 LOGGER.info("Running step %s" % step.name)
                 step.status = PipelineStatus.IN_PROGRESS
                 container = self._docker_service.provision(
-                    pipeline.run_id,
+                    pipeline.run_uuid,
                     step.image,
                     workspace_path
                 )
