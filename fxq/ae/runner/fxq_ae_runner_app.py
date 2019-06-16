@@ -1,18 +1,39 @@
+import docker
+import requests
 from flask import Flask, request, jsonify
 from fxq.core.beans.factory.annotation import Autowired
 
-from fxq.ae.runner.model import Request
-from fxq.ae.runner.service import RequestService
+from fxq.ae.runner.model.job import Job
+from fxq.ae.runner.model.run import Run
+from fxq.ae.runner.model.status import Health
+from fxq.ae.runner.service.docker import DockerService
+from fxq.ae.runner.service.job import JobService
 
 app = Flask(__name__)
 
-request_service = Autowired(type=RequestService)
+job_service = Autowired(type=JobService)
+
+docker_service = Autowired(type=DockerService)
 
 
 @app.route('/api/request', methods=['POST'])
 def start():
+    job: Job = Job.of_dict(request.json)
+    run: Run = job_service.process_request(job)
     return jsonify(
-        request_service.process_request(
-            Request.of_url(request.json["url"])
-        ).__json__()
+        run.to_dict()
     )
+
+
+@app.route('/api/health', methods=['GET'])
+def check_health():
+    try:
+        docker_service.list_containers()
+        return jsonify(Health("UP").to_dict())
+    except requests.exceptions.ConnectionError as e:
+        return jsonify(Health("DOWN", {"error": "Docker ConnectionError, Check Docker Engine and Socket is up"}).to_dict())
+    except docker.errors.APIError:
+        return jsonify(Health("DOWN", {"error": "Docker APIError, Check Docker Engine is Running and API Socket is working"}).to_dict())
+    except Exception as e:
+        print(e.__class__)
+        return jsonify(Health("DOWN", {"error": str(e)}).to_dict())

@@ -1,12 +1,11 @@
 import logging
 
-import docker
-from docker import DockerClient
+from docker import DockerClient, from_env
 from docker.models.containers import Container
 from fxq.core.stereotype import Service
 
 from fxq.ae.runner import constants
-from fxq.ae.runner.model import Command
+from fxq.ae.runner.model.run import Command
 
 LOGGER = logging.getLogger(__name__)
 
@@ -15,7 +14,10 @@ LOGGER = logging.getLogger(__name__)
 class DockerService:
 
     def __init__(self):
-        self._docker_client: DockerClient = docker.from_env()
+        self._docker_client: DockerClient = from_env()
+
+    def list_containers(self):
+        return self._docker_client.containers.list()
 
     def provision(self, name: str, image: str, workspace_path: str = None) -> Container:
         name = name.replace(" ", "_")
@@ -28,23 +30,17 @@ class DockerService:
         else:
             return self._provision_with_volume(name, image, workspace_path)
 
-    def run_command(self, container: Container, command: Command) -> Command:
-        LOGGER.info("Running Container Command \"%s\"" % command.instruction)
+    def run_command(self, container: Container, instruction: str):
+        LOGGER.info("Running Container Command \"%s\"" % instruction)
         response = container.exec_run(
-            ["/bin/sh", "-c", command.instruction],
+            ["/bin/sh", "-c", instruction],
             privileged=True,
             tty=True,
             stream=True,
-            demux=False,
+            demux=True,
             workdir=constants.PIPELINE_MOUNT_TARGET
         )
-        while True:
-            try:
-                command.append_output(next(response.output).decode())
-            except StopIteration:
-                break
-
-        return command
+        return response.output
 
     def teardown(self, container: Container):
         LOGGER.debug("Starting Teardown")
