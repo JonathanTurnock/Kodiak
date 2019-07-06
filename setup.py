@@ -22,7 +22,7 @@ setup(
     install_requires=[
         'docker',
         'flask',
-        'fxq.core',
+        'fxq-core',
         'gitpython',
         'pyyaml'
     ],
