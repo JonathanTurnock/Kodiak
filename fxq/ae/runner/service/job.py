@@ -30,7 +30,7 @@ class JobService:
     def process_request(self, job: Job) -> Run:
         LOGGER.info("Processing Request %s" % job.name)
         workspace_path = JobService._get_workspace_path()
-        JobService._clone_repo(job.scm_repo.url, workspace_path)
+        JobService._clone_repo(job.git_url, workspace_path)
         LOGGER.debug("Cloned Repo into Workspace %s" % workspace_path)
         run = RunFactory.get_from_yml_file(job, "%s/%s" % (workspace_path, constants.PIPELINE_YML_NAME))
         t = threading.Thread(target=self._run, args=(run, workspace_path))

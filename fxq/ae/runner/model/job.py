@@ -3,28 +3,23 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-class ScmRepo:
-    def __init__(self, url):
-        self.url: str = url
-
-
 class Job:
-    def __init__(self, name: str, scm_repo: ScmRepo):
+    def __init__(self, name: str, git_url: str):
         self.name = name
-        self.scm_repo = scm_repo
+        self.git_url = git_url
         self._links = None
 
     def to_dict(self):
         return {
             'name': self.name,
-            'scmRepo': self.scm_repo
+            'gitUrl': self.git_url
         }
 
     @staticmethod
     def of_dict(_dict):
         job = Job(
             _dict["name"],
-            ScmRepo(_dict["scmRepo"]["url"])
+            _dict["gitUrl"]
         )
         try:
             job._links = _dict["_links"]
