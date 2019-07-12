@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='fxq-ae-runner',
-    version='0.0.13',
+    version='0.0.14-SNAPSHOT',
     packages=[
         'fxq.ae.runner',
         'fxq.ae.runner.callback',
