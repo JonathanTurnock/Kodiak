@@ -6,10 +6,13 @@ from fxq.core.beans.factory.annotation import Autowired
 from fxq.ae.agent.model.job import Job
 from fxq.ae.agent.model.run import Run
 from fxq.ae.agent.model.status import Health
+from fxq.ae.agent.service.consul import ConsulService
 from fxq.ae.agent.service.docker import DockerService
 from fxq.ae.agent.service.job import JobService
 
 app = Flask(__name__)
+
+consul_service = Autowired(type=ConsulService)
 
 job_service = Autowired(type=JobService)
 
