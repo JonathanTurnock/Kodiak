@@ -28,7 +28,7 @@ def start():
     )
 
 
-@app.route('/api/health', methods=['GET'])
+@app.route('/api/actuator/health', methods=['GET'])
 def check_health():
     try:
         docker_service.list_containers()
