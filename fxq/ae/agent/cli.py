@@ -2,8 +2,8 @@ import logging
 
 import click
 
-from fxq.ae.runner.constants import LOGGING_FORMAT
-from fxq.ae.runner.fxq_ae_runner_app import app
+from fxq.ae.agent.constants import LOGGING_FORMAT
+from fxq.ae.agent.fxq_ae_agent_app import app
 
 
 @click.command()

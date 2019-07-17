@@ -4,8 +4,8 @@ from docker import DockerClient, from_env
 from docker.models.containers import Container
 from fxq.core.stereotype import Service
 
-from fxq.ae.runner import constants
-from fxq.ae.runner.model.run import Command
+from fxq.ae.agent import constants
+from fxq.ae.agent.model.run import Command
 
 LOGGER = logging.getLogger(__name__)
 

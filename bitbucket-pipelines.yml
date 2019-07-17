@@ -12,17 +12,6 @@ pipelines:
             - python -m xmlrunner discover tests/ -o build/test-reports
             - python setup.py sdist bdist_wheel
       - step:
-          name: Build Snapshot image and Deploy to Dockerhub
-          services:
-            - docker
-          script:
-            - export PROJECT_VERSION=$(grep 'version=' setup.py | tr -d " |'|version=|,")
-            - export LATEST_IMAGE_NAME=fxquants/ae-runner:latest
-            - echo "Building Docker image for ae_runner $PROJECT_VERSION"
-            - docker build -t $LATEST_IMAGE_NAME .
-            - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-            - docker push $LATEST_IMAGE_NAME
-      - step:
           name: Release
           trigger: manual
           script:
@@ -42,19 +31,6 @@ pipelines:
                 PYPI_USERNAME: $PYPI_USERNAME
                 PYPI_PASSWORD: $PYPI_PASSWORD
                 DISTRIBUTIONS: 'sdist bdist_wheel'
-      - step:
-          name: Build release image and Deploy to Dockerhub
-          services:
-            - docker
-          script:
-            - export PROJECT_VERSION=$(grep 'version=' setup.py | tr -d " |'|version=|,")
-            - export VERSIONED_IMAGE_NAME=fxquants/ae-runner:$PROJECT_VERSION
-            - export LATEST_IMAGE_NAME=fxquants/ae-runner:latest
-            - echo "Building Docker image for ae_runner $PROJECT_VERSION"
-            - docker build -t $VERSIONED_IMAGE_NAME -t $LATEST_IMAGE_NAME .
-            - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-            - docker push $VERSIONED_IMAGE_NAME
-            - docker push $LATEST_IMAGE_NAME
 
 
 

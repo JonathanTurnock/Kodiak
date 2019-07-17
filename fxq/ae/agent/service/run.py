@@ -5,9 +5,9 @@ from docker.models.containers import Container
 from fxq.core.beans.factory.annotation import Autowired
 from fxq.core.stereotype import Service
 
-from fxq.ae.runner.model.run import Run, Step, Command
-from fxq.ae.runner.model.status import Status
-from fxq.ae.runner.service.docker import DockerService
+from fxq.ae.agent.model.run import Run, Step, Command
+from fxq.ae.agent.model.status import Status
+from fxq.ae.agent.service.docker import DockerService
 
 LOGGER = logging.getLogger(__name__)
 

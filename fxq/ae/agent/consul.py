@@ -6,8 +6,8 @@ import requests
 
 
 # service_def = {
-#     "ID": "ae-runner-5000",
-#     "Service": "ae-runner",
+#     "ID": "ae-agent-5000",
+#     "Service": "ae-agent",
 #     "Tags": [
 #       "secure=false"
 #     ],
@@ -18,10 +18,10 @@ import requests
 #
 # service_check = {
 #     "Node": first_node["Node"],
-#     "CheckID": "service:ae-runner-5000",
-#     "Name": "Service 'ae-runner' check",
+#     "CheckID": "service:ae-agent-5000",
+#     "Name": "Service 'ae-agent' check",
 #     "Status": "passing",
-#     "ServiceID": "ae-runner-5000",
+#     "ServiceID": "ae-agent-5000",
 #     "Definition": {
 #       "Http": "http://172.16.0.101:5000/api/health",
 #       "Interval": "15s",
@@ -31,8 +31,8 @@ import requests
 # }
 
 service_def = {
-  "ID": "service:ae-runner-5000",
-  "Name": "ae-runner",
+  "ID": "service:ae-agent-5000",
+  "Name": "ae-agent",
   "Tags": ["secure=false"],
   "Address": "172.16.0.101",
   "Port": 5000,

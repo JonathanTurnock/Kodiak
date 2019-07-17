@@ -1,6 +1,6 @@
 .idea/
 bin/
 dist/
-fxq_ae_runner.egg-info/
+fxq_ae_agent.egg-info/
 lib/
 venv/

@@ -8,12 +8,12 @@ from fxq.core.beans.factory.annotation import Autowired
 from fxq.core.stereotype import Service
 from git import Repo
 
-from fxq.ae.runner import constants
-from fxq.ae.runner.factory.run import RunFactory
-from fxq.ae.runner.model.job import Job
-from fxq.ae.runner.model.run import Run
-from fxq.ae.runner.service.docker import DockerService
-from fxq.ae.runner.service.run import RunService
+from fxq.ae.agent import constants
+from fxq.ae.agent.factory.run import RunFactory
+from fxq.ae.agent.model.job import Job
+from fxq.ae.agent.model.run import Run
+from fxq.ae.agent.service.docker import DockerService
+from fxq.ae.agent.service.run import RunService
 
 LOGGER = logging.getLogger(__name__)
 

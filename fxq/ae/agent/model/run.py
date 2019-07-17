@@ -2,9 +2,9 @@ import uuid
 from datetime import datetime
 from typing import List, Dict
 
-from fxq.ae.runner.callback.handler import do_callback
-from fxq.ae.runner.model.job import Job
-from fxq.ae.runner.model.status import Status
+from fxq.ae.agent.callback.handler import do_callback
+from fxq.ae.agent.model.job import Job
+from fxq.ae.agent.model.status import Status
 
 
 class Run:

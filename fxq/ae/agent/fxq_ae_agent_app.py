@@ -3,11 +3,11 @@ import requests
 from flask import Flask, request, jsonify
 from fxq.core.beans.factory.annotation import Autowired
 
-from fxq.ae.runner.model.job import Job
-from fxq.ae.runner.model.run import Run
-from fxq.ae.runner.model.status import Health
-from fxq.ae.runner.service.docker import DockerService
-from fxq.ae.runner.service.job import JobService
+from fxq.ae.agent.model.job import Job
+from fxq.ae.agent.model.run import Run
+from fxq.ae.agent.model.status import Health
+from fxq.ae.agent.service.docker import DockerService
+from fxq.ae.agent.service.job import JobService
 
 app = Flask(__name__)
 

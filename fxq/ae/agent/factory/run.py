@@ -1,7 +1,7 @@
 import yaml
 
-from fxq.ae.runner.model.job import Job
-from fxq.ae.runner.model.run import Run, Command, Step
+from fxq.ae.agent.model.job import Job
+from fxq.ae.agent.model.run import Run, Command, Step
 
 
 class RunFactory:

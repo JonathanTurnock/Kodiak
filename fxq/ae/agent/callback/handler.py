@@ -5,7 +5,7 @@ from http import HTTPStatus
 
 import requests
 
-from fxq.ae.runner.constants import JSON_HEADERS, URI_LIST_HEADERS
+from fxq.ae.agent.constants import JSON_HEADERS, URI_LIST_HEADERS
 
 try:
     run_callback_url = os.environ["RUN_CALLBACK_URL"]
