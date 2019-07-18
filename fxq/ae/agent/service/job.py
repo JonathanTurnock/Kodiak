@@ -29,15 +29,16 @@ class JobService:
 
     def process_request(self, job: Job) -> Run:
         LOGGER.info("Processing Request %s" % job.name)
-        workspace_path = JobService._get_workspace_path()
-        JobService._clone_repo(job.git_url, workspace_path)
-        LOGGER.debug("Cloned Repo into Workspace %s" % workspace_path)
-        run = RunFactory.get_from_yml_file(job, "%s/%s" % (workspace_path, constants.PIPELINE_YML_NAME))
-        t = threading.Thread(target=self._run, args=(run, workspace_path))
+        run = RunFactory.prepare(job)
+        t = threading.Thread(target=self._run, args=(run,))
         t.start()
         return run
 
-    def _run(self, run: Run, workspace_path: str):
+    def _run(self, run: Run):
+        workspace_path = JobService._get_workspace_path()
+        JobService._clone_repo(run.job.git_url, workspace_path)
+        LOGGER.debug("Cloned Repo into Workspace %s" % workspace_path)
+        RunFactory.configure_from_yml_file(run, "%s/%s" % (workspace_path, constants.PIPELINE_YML_NAME))
         LOGGER.info("Starting a new run thread for uuid %s" % run.uuid)
         self.run_service.start(run, workspace_path)
         shutil.rmtree(workspace_path)

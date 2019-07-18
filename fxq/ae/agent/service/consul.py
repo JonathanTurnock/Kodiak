@@ -6,6 +6,8 @@ import socket
 import requests
 from fxq.core.stereotype import Service
 
+from fxq.ae.agent.constants import ANALYTICS_SERVICE_ID
+
 LOGGER = logging.getLogger(__name__)
 
 host_name = socket.gethostname()
@@ -36,6 +38,7 @@ try:
 except KeyError:
     _consul_port = 8500
     LOGGER.warning(f'Environment Variable: "spring.cloud.consul.port" is not defined, falling back to {_consul_port}')
+
 
 @Service
 class ConsulService:
@@ -70,3 +73,14 @@ class ConsulService:
         r = requests.put(f'http://{self.consul_host}:{self.consul_port}/v1/agent/service/register', json=service_def)
         if r.status_code != http.HTTPStatus.OK:
             raise Exception(f'Failed to register with Consul at http://{self.consul_host}:{self.consul_port}')
+
+    def get_callback_host(self):
+        r = requests.get(f'http://{self.consul_host}:{self.consul_port}/v1/agent/service/{ANALYTICS_SERVICE_ID}')
+        if r.status_code != http.HTTPStatus.OK:
+            raise Exception(
+                f'Failed to get the Analytics Service using ID "analytics-8200", check it is registered with consul'
+            )
+
+        service_definition = r.json()
+
+        return f'http://{service_definition["Address"]}:{service_definition["Port"]}'

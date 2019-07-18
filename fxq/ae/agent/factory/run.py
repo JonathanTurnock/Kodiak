@@ -7,10 +7,13 @@ from fxq.ae.agent.model.run import Run, Command, Step
 class RunFactory:
 
     @staticmethod
-    def get_from_yml_file(job: Job, yml_path: str) -> Run:
+    def prepare(job: Job):
+        return Run(job)
+
+    @staticmethod
+    def configure_from_yml_file(run: Run, yml_path: str) -> Run:
         with open(yml_path) as ymlf:
             run_yml = yaml.load(ymlf, Loader=yaml.SafeLoader)
-            run = Run(job)
             s_no = 0
             for s in run_yml["pipelines"]["steps"]:
                 s_no += 1

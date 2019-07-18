@@ -1,42 +1,45 @@
 import json
 import logging
-import os
+import threading
 from http import HTTPStatus
 
 import requests
+from fxq.core.beans.factory.annotation import Autowired
 
 from fxq.ae.agent.constants import JSON_HEADERS, URI_LIST_HEADERS
-
-try:
-    run_callback_url = os.environ["RUN_CALLBACK_URL"]
-except KeyError:
-    run_callback_url = None
-
-try:
-    step_callback_url = os.environ["STEP_CALLBACK_URL"]
-except KeyError:
-    step_callback_url = None
-
-try:
-    cmd_callback_url = os.environ["CMD_CALLBACK_URL"]
-except KeyError:
-    cmd_callback_url = None
+from fxq.ae.agent.service.consul import ConsulService
 
 LOGGER = logging.getLogger(__name__)
 
+consul_service: ConsulService = Autowired(type=ConsulService)
+callback_host = None
+
+
+def get_callback_host():
+    global callback_host
+    callback_host = f'{consul_service.get_callback_host()}'
+    LOGGER.info(f'Configuring callback host as {callback_host}')
+
+get_callback_host()
+t = threading.Timer(30.0, get_callback_host)
+t.start()
 
 def get_callback_url(ref_object):
     if ref_object.__class__.__name__ == "Run":
-        return run_callback_url
+        return f'{callback_host}/api/data/runs'
     if ref_object.__class__.__name__ == "Step":
-        return step_callback_url
+        return f'{callback_host}/api/data/steps'
     if ref_object.__class__.__name__ == "Command":
-        return cmd_callback_url
+        return f'{callback_host}/api/data/commands'
 
 
 def do_callback(ref_object):
-    LOGGER.info("Performing Callback for %s" % ref_object.to_dict())
     callback_url = get_callback_url(ref_object)
+    if callback_url:
+        LOGGER.info("Performing Callback for %s" % ref_object.to_dict())
+    else:
+        LOGGER.warning("No Callback URL could be determined")
+
     if callback_url and ref_object._links:
         r = requests.patch(
             ref_object._links["self"]["href"],
