@@ -17,12 +17,16 @@ callback_host = None
 
 def get_callback_host():
     global callback_host
-    callback_host = f'{consul_service.get_callback_host()}'
-    LOGGER.info(f'Configuring callback host as {callback_host}')
+    try:
+        callback_host = f'{consul_service.get_callback_host()}'
+        LOGGER.info(f'Configuring callback host as {callback_host}')
+        t = threading.Timer(30.0, get_callback_host)
+        t.start()
+    except Exception as e:
+        LOGGER.error(e)
+
 
 get_callback_host()
-t = threading.Timer(30.0, get_callback_host)
-t.start()
 
 def get_callback_url(ref_object):
     if ref_object.__class__.__name__ == "Run":
