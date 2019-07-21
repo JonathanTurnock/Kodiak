@@ -16,12 +16,12 @@ host_ip = socket.gethostbyname(host_name)
 try:
     _host = os.environ["spring.cloud.consul.discovery.hostname"]
 except KeyError:
-    _host = host_name if 'fxquants.net' in host_name else host_ip
+    _host = host_name if 'fxq.net' in host_name else host_ip
     LOGGER.warning(
         f'Environment Variable: "spring.cloud.consul.discovery.hostname" is not defined, falling back to {_host}')
 
 try:
-    _port = os.environ["spring.cloud.consul.discovery.port"]
+    _port = int(os.environ["spring.cloud.consul.discovery.port"])
 except KeyError:
     _port = 5000
     LOGGER.warning(
@@ -34,7 +34,7 @@ except KeyError:
     LOGGER.warning(f'Environment Variable: "spring.cloud.consul.host is not defined, falling back to {_consul_host}')
 
 try:
-    _consul_port = os.environ["spring.cloud.consul.port"]
+    _consul_port = int(os.environ["spring.cloud.consul.port"])
 except KeyError:
     _consul_port = 8500
     LOGGER.warning(f'Environment Variable: "spring.cloud.consul.port" is not defined, falling back to {_consul_port}')
@@ -72,11 +72,13 @@ class ConsulService:
 
         r = requests.put(f'http://{self.consul_host}:{self.consul_port}/v1/agent/service/register', json=service_def)
         if r.status_code != http.HTTPStatus.OK:
+            LOGGER.error(f'Registration Failed CODE:{r.status_code} ERROR:{r.text}')
             raise Exception(f'Failed to register with Consul at http://{self.consul_host}:{self.consul_port}')
 
     def get_callback_host(self):
         r = requests.get(f'http://{self.consul_host}:{self.consul_port}/v1/agent/service/{ANALYTICS_SERVICE_ID}')
         if r.status_code != http.HTTPStatus.OK:
+            LOGGER.error(f'Query Failed CODE:{r.status_code} ERROR:{r.text}')
             raise Exception(
                 f'Failed to get the Analytics Service using ID "analytics-8200", check it is registered with consul'
             )
