@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='fxq-ae-agent',
-    version='0.0.15-SNAPSHOT',
+    version='0.0.15',
     packages=[
         'fxq.ae.agent',
         'fxq.ae.agent.callback',
