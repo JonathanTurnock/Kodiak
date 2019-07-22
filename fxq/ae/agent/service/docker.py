@@ -35,7 +35,6 @@ class DockerService:
         response = container.exec_run(
             ["/bin/sh", "-c", instruction],
             privileged=True,
-            tty=True,
             stream=True,
             demux=True,
             workdir=constants.PIPELINE_MOUNT_TARGET
