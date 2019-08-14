@@ -66,13 +66,12 @@ def register_new_object(ref_object, callback_url):
     update_links(ref_object)
 
 
-def update_existing_object(ref_object, callback_url):
+def update_existing_object(ref_object):
     '''
-    Simply Sends a PATCH request with the serialized representation of the object to update assocaited
+    Simply Sends a PATCH request with the serialized representation of the object to update associated
     fields on their change.
 
     :param ref_object: The Object to be serialized for the endpoint
-    :param callback_url: The Endpoint to receive the POST request
     :return: NA
     '''
     LOGGER.debug(f"Updating Existing Object: {ref_object} at {ref_object._links['self']['href']}")
@@ -118,7 +117,7 @@ def do_callback(ref_object):
     if callback_url:
         LOGGER.info(f"Performing Callback for {ref_object.__class__.__name__} - {ref_object.to_dict()}")
         if ref_object._links:
-            update_existing_object(ref_object, callback_url)
+            update_existing_object(ref_object)
         elif ref_object._links is None:
             register_new_object(ref_object, callback_url)
     else:
