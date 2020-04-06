@@ -1,7 +1,7 @@
 import yaml
 
-from fxq.ae.agent.model.job import Job
-from fxq.ae.agent.model.run import Run, Command, Step
+from kodiak.agent import Job
+from kodiak.agent.model.run import Run, Command, Step
 
 
 class RunFactory:

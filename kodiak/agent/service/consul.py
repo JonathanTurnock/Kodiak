@@ -4,9 +4,8 @@ import os
 import socket
 
 import requests
-from fxq.core.stereotype import Service
 
-from fxq.ae.agent.constants import ANALYTICS_SERVICE_ID
+from kodiak.constants import ANALYTICS_SERVICE_ID
 
 LOGGER = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ host_ip = socket.gethostbyname(host_name)
 try:
     _host = os.environ["spring.cloud.consul.discovery.hostname"]
 except KeyError:
-    _host = host_name if 'fxq.net' in host_name else host_ip
+    _host = host_name if 'kodiak.net' in host_name else host_ip
     LOGGER.warning(
         f'Environment Variable: "spring.cloud.consul.discovery.hostname" is not defined, falling back to {_host}')
 
@@ -40,7 +39,6 @@ except KeyError:
     LOGGER.warning(f'Environment Variable: "spring.cloud.consul.port" is not defined, falling back to {_consul_port}')
 
 
-@Service
 class ConsulService:
     def __init__(self):
         self.host = _host

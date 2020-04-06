@@ -1,8 +1,9 @@
 click
 docker
 flask
-fxq-core
 gitpython
 pyyaml
 requests
-unittest-xml-reporting
+pytest
+pytest-cov
+black

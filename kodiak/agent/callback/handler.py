@@ -4,14 +4,12 @@ import threading
 from http import HTTPStatus
 
 import requests
-from fxq.core.beans.factory.annotation import Autowired
 
-from fxq.ae.agent.constants import JSON_HEADERS, URI_LIST_HEADERS
-from fxq.ae.agent.service.consul import ConsulService
+from kodiak.bootstrap import consul_service
+from kodiak.constants import JSON_HEADERS, URI_LIST_HEADERS
 
 LOGGER = logging.getLogger(__name__)
 
-consul_service: ConsulService = Autowired(type=ConsulService)
 callback_host = None
 
 

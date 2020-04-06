@@ -2,20 +2,16 @@ import logging
 from datetime import datetime
 
 from docker.models.containers import Container
-from fxq.core.beans.factory.annotation import Autowired
-from fxq.core.stereotype import Service
 
-from fxq.ae.agent.model.run import Run, Step, Command
-from fxq.ae.agent.model.status import Status
-from fxq.ae.agent.service.docker import DockerService
+from kodiak.agent.model.run import Run, Step, Command
+from kodiak.agent.model.status import Status
+from kodiak.agent.service.docker import DockerService
 
 LOGGER = logging.getLogger(__name__)
 
 
-@Service
 class RunService:
 
-    @Autowired
     def __init__(self, docker_service):
         self._docker_service: DockerService = docker_service
 

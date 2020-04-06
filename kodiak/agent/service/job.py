@@ -4,24 +4,21 @@ import shutil
 import threading
 import uuid
 
-from fxq.core.beans.factory.annotation import Autowired
-from fxq.core.stereotype import Service
+
 from git import Repo
 
-from fxq.ae.agent import constants
-from fxq.ae.agent.factory.run import RunFactory
-from fxq.ae.agent.model.job import Job
-from fxq.ae.agent.model.run import Run
-from fxq.ae.agent.service.docker import DockerService
-from fxq.ae.agent.service.run import RunService
+from kodiak import constants
+from kodiak.agent.factory.run import RunFactory
+from kodiak.agent.model.job import Job
+from kodiak.agent.model.run import Run
+from kodiak.agent.service.docker import DockerService
+from kodiak.agent.service.run import RunService
 
 LOGGER = logging.getLogger(__name__)
 
 
-@Service
 class JobService:
 
-    @Autowired
     def __init__(self, run_service, docker_service):
         self.run_service: RunService = run_service
         self.docker_service: DockerService = docker_service

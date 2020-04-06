@@ -2,15 +2,12 @@ import logging
 
 from docker import DockerClient, from_env
 from docker.models.containers import Container
-from fxq.core.stereotype import Service
 
-from fxq.ae.agent import constants
-from fxq.ae.agent.model.run import Command
+from kodiak import constants
 
 LOGGER = logging.getLogger(__name__)
 
 
-@Service
 class DockerService:
 
     def __init__(self):

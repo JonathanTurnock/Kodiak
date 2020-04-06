@@ -3,30 +3,31 @@ import pathlib
 from setuptools import setup
 
 setup(
-    name='fxq-ae-agent',
+    name='kodiak-ae-agent',
     version='0.0.17-SNAPSHOT',
     packages=[
-        'fxq.ae.agent',
-        'fxq.ae.agent.callback',
-        'fxq.ae.agent.factory',
-        'fxq.ae.agent.model',
-        'fxq.ae.agent.service',
+        'kodiak.agent',
+        'kodiak.agent.callback',
+        'kodiak.agent.factory',
+        'kodiak.agent.model',
+        'kodiak.agent.service',
+        'kodiak.server'
     ],
-    url='https://bitbucket.org/fxquants/ae-agent/',
+    url='https://bitbucket.org/fxqlabs-oss/kodiak/',
     license='MIT',
     author='Jonathan Turnock',
-    author_email='jonathan.turnock@fxquants.net',
-    description='Analytics Engine Agent Client, Provisions and executes docker pipelines from git repo yml',
+    author_email='jonathan.turnock@outlook.com',
+    description='Docker host orchestration app to run pipelines',
     long_description=(pathlib.Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
     install_requires=[
+        'click',
         'docker',
         'flask',
-        'fxq-core',
         'gitpython',
         'pyyaml'
     ],
     entry_points={
-        'console_scripts': ['fxq-ae-agent=fxq.ae.agent.cli:main'],
+        'console_scripts': ['kodiak=kodiak.cli:main'],
     }
 )
