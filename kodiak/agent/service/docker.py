@@ -3,7 +3,7 @@ import logging
 from docker import DockerClient, from_env
 from docker.models.containers import Container
 
-from kodiak import constants
+import constants
 
 LOGGER = logging.getLogger(__name__)
 

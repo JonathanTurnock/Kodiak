@@ -4,10 +4,9 @@ import shutil
 import threading
 import uuid
 
-
 from git import Repo
 
-from kodiak import constants
+import constants
 from kodiak.agent.factory.run import RunFactory
 from kodiak.agent.model.job import Job
 from kodiak.agent.model.run import Run

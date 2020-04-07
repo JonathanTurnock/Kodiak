@@ -1,6 +1,6 @@
 import yaml
 
-from kodiak.agent import Job
+from kodiak.agent.model.job import Job
 from kodiak.agent.model.run import Run, Command, Step
 
 

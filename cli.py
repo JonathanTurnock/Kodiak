@@ -2,8 +2,8 @@ import logging
 
 import click
 
-from kodiak.constants import LOGGING_FORMAT
-from kodiak.app import app
+from app import app
+from constants import LOGGING_FORMAT
 
 
 @click.command()

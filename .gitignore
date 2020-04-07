@@ -4,3 +4,28 @@ dist/
 fxq_ae_agent.egg-info/
 lib/
 venv/
+
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+kodiak-ui/node_modules
+kodiak-ui/.pnp
+kodiak-ui/.pnp.js
+
+# testing
+kodiak-ui/coverage
+
+# production
+kobiak-ui/build
+
+# misc
+kodiak-ui/.DS_Store
+kodiak-ui/.env.local
+kodiak-ui/.env.development.local
+kodiak-ui/.env.test.local
+kodiak-ui/.env.production.local
+
+kodiak-ui/npm-debug.log*
+kodiak-ui/yarn-debug.log*
+kodiak-ui/yarn-error.log*
