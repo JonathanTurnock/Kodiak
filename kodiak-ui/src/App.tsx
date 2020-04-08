@@ -1,26 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
+import './bootstrap.min.css'
 import './App.css';
+import Navbar from "./components/Navbar";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import Jobs from "./pages/Jobs";
+import Runs from "./pages/Runs";
+import {NavbarLink} from "./types/navbar";
+
+const links: NavbarLink[] = [
+    {
+        name: "Jobs",
+        path: "/jobs",
+        component: Jobs
+    },
+    {
+        name: "Runs",
+        path: "/runs",
+        component: Runs
+    }
+]
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Router>
+            <div className="App">
+                <header className="App-header">
+                    <Navbar links={links}/>
+                    <Switch>
+                        {links.map(l => (
+                            <Route path={l.path}>
+                                {l.component}
+                            </Route>
+                        ))}
+                    </Switch>
+                </header>
+            </div>
+        </Router>
+    );
 }
 
 export default App;

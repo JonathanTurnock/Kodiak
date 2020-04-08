@@ -17,7 +17,9 @@ kodiak-ui/.pnp.js
 kodiak-ui/coverage
 
 # production
-kobiak-ui/build
+kodiak-ui/build
+kodiak-ui/web
+
 
 # misc
 kodiak-ui/.DS_Store

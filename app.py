@@ -1,4 +1,5 @@
 import os
+from os import path
 from pathlib import Path
 
 from docker.errors import APIError
@@ -27,7 +28,10 @@ def index():
 
 @app.route('/<file>')
 def web(file):
-    return send_from_directory(web_root, file)
+    if path.exists(Path(web_root, file)):
+        return send_from_directory(web_root, file)
+    else:
+        return index()
 
 
 @app.route('/api/request', methods=['POST'])
