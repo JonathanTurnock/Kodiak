@@ -1,0 +1,24 @@
+schema {
+    query: RootQuery
+}
+
+# A comment within an objective
+type Comment {
+    id: ID!
+    author: String!
+    content: String!
+}
+
+type RootQuery {
+
+    # Gets all the comments
+    getComments: [Comment]!
+
+}
+
+type Mutation {
+
+    # Adds a new comment  with the supplied content and author to the objective with the given id
+    addComment(author: String!, content: String!): Comment!
+
+}

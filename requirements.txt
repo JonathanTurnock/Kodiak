@@ -1,9 +1,13 @@
 click
 docker
 flask
+multipledispatch
+fxq-commons
 gitpython
 pyyaml
 requests
 pytest
 pytest-cov
 black
+graphene
+flask_graphql

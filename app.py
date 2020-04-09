@@ -1,24 +1,25 @@
+from docker.errors import APIError
 import os
 from os import path
 from pathlib import Path
 
-from docker.errors import APIError
 from flask import Flask, request, jsonify, send_from_directory
+from flask_graphql import GraphQLView
 
+from bootstrap import web_root, job_service, docker_service
 from kodiak.agent.model.job import Job
 from kodiak.agent.model.run import Run
 from kodiak.agent.model.status import Health
-from kodiak.agent.service.docker import DockerService
-from kodiak.agent.service.job import JobService
-from kodiak.agent.service.run import RunService
-
-web_root = str(Path(os.path.abspath(os.path.dirname(__file__)), 'web').absolute())
-
-docker_service = DockerService()
-run_service = RunService(docker_service)
-job_service = JobService(run_service, docker_service)
+from kodiak.server.gql import schema
 
 app = Flask(__name__, root_path=web_root)
+
+app.add_url_rule('/api/graphql',
+                 view_func=GraphQLView.as_view('graphql', graphiql_version="0.17.5", schema=schema,
+                                               graphiql=True))
+
+
+# app.add_url_rule('/api/graphql/batch', view_func=GraphQLView.as_view('graphql', schema=schema, batch=True))
 
 
 @app.route('/')
