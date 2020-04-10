@@ -1,0 +1,13 @@
+GET http://localhost:5000/api/health
+content-Type: application/json
+
+### Send POST request with json body
+POST http://localhost:5000/api/request
+Content-Type: application/json
+
+{
+  "name": "Test Job",
+  "gitUrl": "git@bitbucket.org:fxqlabs/aep-hello-world.git"
+}
+
+###

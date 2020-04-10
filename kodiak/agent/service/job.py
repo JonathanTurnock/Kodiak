@@ -2,7 +2,6 @@ import logging
 import os
 import shutil
 import threading
-import uuid
 
 from git import Repo
 
@@ -12,6 +11,7 @@ from kodiak.agent.model.job import Job
 from kodiak.agent.model.run import Run
 from kodiak.agent.service.docker import DockerService
 from kodiak.agent.service.run import RunService
+from kodiak.utils.id import new_string_id
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class JobService:
         return "%s/%s/%s" % (
             constants.PIPELINE_BASE,
             constants.PROJECTS_FOLDER,
-            uuid.uuid4()
+            new_string_id()
         )
 
     @staticmethod

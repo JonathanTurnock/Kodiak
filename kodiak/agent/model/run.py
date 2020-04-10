@@ -1,35 +1,30 @@
-import uuid
 from datetime import datetime
-from typing import List, Dict
+from typing import List
 
 from kodiak.agent.callback.handler import do_callback
 from kodiak.agent.model.job import Job
 from kodiak.agent.model.status import Status
+from kodiak.utils.id import new_string_id
 
 
 class Run:
     def __init__(self, job):
-        self.uuid: str = str(uuid.uuid4())
+        self.uuid: str = new_string_id()
         self.job: Job = job
         self._status: Status = Status.PENDING
         self.started: datetime = datetime.now()
         self.ended: datetime = None
         self.steps: List[Step] = []
-        self._links: Dict = None
         do_callback(self)
 
     def to_dict(self):
-        dict = {
+        return {
             'uuid': self.uuid,
+            'jobId': self.job.uuid,
             'status': self.status.name,
             'started': self.started.isoformat(),
             'ended': self.ended.isoformat() if self.ended is not None else None
         }
-
-        if self._links:
-            dict["_links"] = self._links
-
-        return dict
 
     @property
     def status(self):
@@ -49,15 +44,15 @@ class Step:
         self.image: str = image
         self._status: Status = Status.PENDING
         self.commands: List[Command] = []
-        self._links = None
         do_callback(self)
 
     def to_dict(self):
         return {
+            'runId': self.run.uuid,
             'number': self.number,
             'name': self.name,
             'image': self.image,
-            'status': self.status.name
+            'status': self.status.name,
         }
 
     @property
@@ -77,7 +72,6 @@ class Command:
         self.instruction: str = instruction
         self.std_out: List[str] = []
         self.std_err: List[str] = []
-        self._links = None
         do_callback(self)
 
     def add_output(self, output):
@@ -90,6 +84,8 @@ class Command:
 
     def to_dict(self):
         return {
+            'runId': self.step.run.uuid,
+            'stepNumber': self.step.number,
             'number': self.number,
             'instruction': self.instruction,
             'stdOut': "".join(self.std_out),

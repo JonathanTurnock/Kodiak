@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import yaml
 
 from kodiak.agent.model.job import Job
 from kodiak.agent.model.run import Run, Command, Step
+from kodiak.agent.service.run import RunException
 
 
 class RunFactory:
@@ -12,6 +15,8 @@ class RunFactory:
 
     @staticmethod
     def configure_from_yml_file(run: Run, yml_path: str) -> Run:
+        RunFactory.__validate_clone(yml_path)
+        RunFactory.__validate_yml_presence(yml_path)
         with open(yml_path) as ymlf:
             run_yml = yaml.load(ymlf, Loader=yaml.SafeLoader)
             s_no = 0
@@ -27,3 +32,15 @@ class RunFactory:
                 run.steps.append(step)
 
             return run
+
+    @staticmethod
+    def __validate_clone(yml_path):
+        yml_path_parent = Path(yml_path).parent
+        if not yml_path_parent.exists():
+            raise RunException(f"Clone not completed as folder {yml_path_parent.absolute()} does not exist")
+
+    @staticmethod
+    def __validate_yml_presence(yml_path):
+        yml_path = Path(yml_path)
+        if not yml_path.exists():
+            raise RunException(f"Unable to locate {yml_path.absolute()}, are you sure the file exists in the repo?")
