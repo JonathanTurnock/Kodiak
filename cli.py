@@ -1,9 +1,13 @@
 import logging
 
+from constants import LOGGING_FORMAT
+
+if __name__ == '__main__':
+    logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+
 import click
 
 from app import app
-from constants import LOGGING_FORMAT
 
 
 @click.command()

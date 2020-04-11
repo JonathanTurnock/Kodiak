@@ -1,24 +1,25 @@
 schema {
     query: RootQuery
+    mutation: RootMutation
 }
 
-# A comment within an objective
-type Comment {
+type Job {
     id: ID!
-    author: String!
-    content: String!
+    uuid: String!
+    name: String!
+    url: String!
 }
 
 type RootQuery {
 
-    # Gets all the comments
-    getComments: [Comment]!
+    getJob(uuid: String!): Job!
+
+    getJobs: [Job]!
 
 }
 
-type Mutation {
+type RootMutation {
 
-    # Adds a new comment  with the supplied content and author to the objective with the given id
-    addComment(author: String!, content: String!): Comment!
+    addJob(name: String!, url: String!): Job!
 
 }

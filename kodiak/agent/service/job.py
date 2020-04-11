@@ -32,7 +32,7 @@ class JobService:
 
     def _run(self, run: Run):
         workspace_path = JobService._get_workspace_path()
-        JobService._clone_repo(run.job.git_url, workspace_path)
+        JobService._clone_repo(run.job.url, workspace_path)
         LOGGER.debug("Cloned Repo into Workspace %s" % workspace_path)
         RunFactory.configure_from_yml_file(run, "%s/%s" % (workspace_path, constants.PIPELINE_YML_NAME))
         LOGGER.info("Starting a new run thread for uuid %s" % run.uuid)

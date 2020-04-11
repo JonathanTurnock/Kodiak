@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
   "name": "Test Job",
-  "gitUrl": "git@bitbucket.org:fxqlabs/aep-hello-world.git"
+  "url": "git@bitbucket.org:fxqlabs/aep-hello-world.git"
 }
 
 ###

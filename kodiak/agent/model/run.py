@@ -4,13 +4,12 @@ from typing import List
 from kodiak.agent.callback.handler import do_callback
 from kodiak.agent.model.job import Job
 from kodiak.agent.model.status import Status
-from kodiak.utils.id import new_string_id
 
 
 class Run:
     def __init__(self, job):
-        self.uuid: str = new_string_id()
         self.job: Job = job
+        self.id = None
         self._status: Status = Status.PENDING
         self.started: datetime = datetime.now()
         self.ended: datetime = None
@@ -19,8 +18,8 @@ class Run:
 
     def to_dict(self):
         return {
-            'uuid': self.uuid,
-            'jobId': self.job.uuid,
+            'id': self.id,
+            'jobId': self.job.id,
             'status': self.status.name,
             'started': self.started.isoformat(),
             'ended': self.ended.isoformat() if self.ended is not None else None
@@ -38,6 +37,7 @@ class Run:
 
 class Step:
     def __init__(self, run, number, name, image):
+        self.id: int = None
         self.run: Run = run
         self.number: int = number
         self.name: str = name
@@ -48,7 +48,8 @@ class Step:
 
     def to_dict(self):
         return {
-            'runId': self.run.uuid,
+            'id': self.id,
+            'runId': self.run.id,
             'number': self.number,
             'name': self.name,
             'image': self.image,
@@ -67,6 +68,7 @@ class Step:
 
 class Command:
     def __init__(self, step, number, instruction):
+        self.id: int = None
         self.step: Step = step
         self.number: int = number
         self.instruction: str = instruction
@@ -84,7 +86,8 @@ class Command:
 
     def to_dict(self):
         return {
-            'runId': self.step.run.uuid,
+            'id': self.id,
+            'runId': self.step.run.id,
             'stepNumber': self.step.number,
             'number': self.number,
             'instruction': self.instruction,

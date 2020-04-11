@@ -1,0 +1,11 @@
+changelog:
+  - changeset:
+      version: 0.0.1
+      comment: Create Changelog Schema
+      author: jonathan.turnock
+      changes:
+        - sql_file:
+            path: resources/db/ddl/0.0.1/001-changelog.sql
+      rollback:
+        - sql_file:
+            path: resources/db/ddl/0.0.1/000-000-rollback.sql

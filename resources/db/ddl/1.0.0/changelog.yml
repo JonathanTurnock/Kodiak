@@ -1,0 +1,17 @@
+changelog:
+  - changeset:
+      version: 1.0.0
+      comment: Create initial database schema
+      author: jonathan.turnock
+      changes:
+        - sql_file:
+            path: resources/db/ddl/1.0.0/001-job.sql
+        - sql_file:
+            path: resources/db/ddl/1.0.0/002-run.sql
+        - sql_file:
+            path: resources/db/ddl/1.0.0/003-step.sql
+        - sql_file:
+            path: resources/db/ddl/1.0.0/004-command.sql
+      rollback:
+        - sql_file:
+            path: resources/db/ddl/1.0.0/000-rollback.sql
