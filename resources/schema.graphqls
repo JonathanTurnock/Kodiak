@@ -5,16 +5,30 @@ schema {
 
 type Job {
     id: ID!
-    uuid: String!
     name: String!
     url: String!
 }
 
+type Run {
+    id: ID!
+    jobId: ID!
+    uuid: String!
+    status: String
+    started: String
+    ended: String
+}
+
 type RootQuery {
 
-    getJob(uuid: String!): Job!
-
     getJobs: [Job]!
+
+    getJob(id: ID!): Job!
+
+    getRuns: [Run]!
+
+    getRun(id: ID!): Run!
+
+    runJob(id: ID!): Run!
 
 }
 

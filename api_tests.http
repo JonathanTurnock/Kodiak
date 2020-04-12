@@ -6,6 +6,7 @@ POST http://localhost:5000/api/request
 Content-Type: application/json
 
 {
+  "id": "1",
   "name": "Test Job",
   "url": "git@bitbucket.org:fxqlabs/aep-hello-world.git"
 }

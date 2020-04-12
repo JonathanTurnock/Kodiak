@@ -4,12 +4,14 @@ from typing import List
 from kodiak.agent.callback.handler import do_callback
 from kodiak.agent.model.job import Job
 from kodiak.agent.model.status import Status
+from kodiak.utils.id import new_string_id
 
 
 class Run:
     def __init__(self, job):
         self.job: Job = job
         self.id = None
+        self.uuid = new_string_id()
         self._status: Status = Status.PENDING
         self.started: datetime = datetime.now()
         self.ended: datetime = None

@@ -11,6 +11,18 @@ class Status(Enum):
     STOPPED = 6
     ABORTED = 7
 
+    @staticmethod
+    def value_of(name):
+        return {
+            "PENDING": Status.PENDING,
+            "SUCCESSFUL": Status.SUCCESSFUL,
+            "FAILED": Status.FAILED,
+            "IN_PROGRESS": Status.IN_PROGRESS,
+            "PAUSED": Status.PAUSED,
+            "STOPPED": Status.STOPPED,
+            "ABORTED": Status.ABORTED
+        }[name]
+
 
 class Health():
     def __init__(self, status: str, details: Dict = None):
