@@ -1,0 +1,15 @@
+{
+  "name": "Flask GraphQL Schema",
+  "schemaPath": "resources/schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "Default GraphQL Endpoint": {
+        "url": "http://localhost:5000/api/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": true
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import logging
 
-from kodiak.server.papi.connection_factory import get_connection
-from kodiak.server.papi.schema.model import SchemaQueryException, ChangeSet
+from kodiak.server.papi._sqlite.connection_factory import get_connection
+from kodiak.server.papi._sqlite.schema.model import SchemaQueryException, ChangeSet
 
 LOGGER = logging.getLogger(__name__)
 
@@ -10,7 +10,8 @@ class SchemaDao:
     _INSERT_NEW_VERSION = "insert into changelog (version, author, comment) values (?, ?, ?)"
     _GET_CURRENT_VERSION = "select version from changelog order by id desc limit 1"
 
-    def get_current_version(self):
+    @staticmethod
+    def get_current_version():
         """
         Gets the current schema version, if schema is not initialized returns 0.0.0
 
@@ -28,7 +29,8 @@ class SchemaDao:
         finally:
             _connection.close()
 
-    def apply_changeset(self, changeset: ChangeSet):
+    @staticmethod
+    def apply_changeset(changeset: ChangeSet):
         """
         Applies the given changeset to the database schema
 
@@ -38,12 +40,12 @@ class SchemaDao:
         _connection = get_connection()
         try:
             LOGGER.debug(f"Applying Changeset Changes")
-            [self._apply_change(change.path) for change in changeset.changes]
+            [SchemaDao._apply_change(change.path) for change in changeset.changes]
             LOGGER.debug(f"Updating Changelog")
-            self._log_changeset_applied(changeset)
+            SchemaDao._log_changeset_applied(changeset)
             LOGGER.info(f"Updated Database to version {changeset.version}")
         except Exception as e:
-            self.rollback_changeset(changeset)
+            SchemaDao.rollback_changeset(changeset)
         finally:
             _connection.close()
 
@@ -55,9 +57,10 @@ class SchemaDao:
         """
         LOGGER.error(f"Attempted to apply changeset {changeset.version} but failed, applying rollback")
         [self._apply_change(rollback.path) for rollback in changeset.rollback]
-        LOGGER.info(f"Successfully applied rollback, current database version is {self.get_current_version()}")
+        LOGGER.info(f"Successfully applied rollback, current database version is {SchemaDao.get_current_version()}")
 
-    def _apply_change(self, change_file):
+    @staticmethod
+    def _apply_change(change_file):
         """
         Executes a Change File on the database
 
@@ -71,7 +74,8 @@ class SchemaDao:
         finally:
             _connection.close()
 
-    def _log_changeset_applied(self, changeset: ChangeSet):
+    @staticmethod
+    def _log_changeset_applied(changeset: ChangeSet):
         """
         Logs that the changeset has been applied to the changelog
 

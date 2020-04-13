@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import List
 
-from kodiak.agent.callback.handler import do_callback
-from kodiak.agent.model.job import Job
-from kodiak.agent.model.status import Status
+from kodiak.agent.callback import do_callback
+from kodiak.model.job import Job
+from kodiak.model.run import Status
 from kodiak.utils.id import new_string_id
 
 

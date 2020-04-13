@@ -11,11 +11,29 @@ type Job {
 
 type Run {
     id: ID!
-    jobId: ID!
+    job: Job!
     uuid: String!
     status: String
     started: String
     ended: String
+    steps: [Step!]
+}
+
+type Step {
+    id: ID!
+    number: Int!
+    name: String!
+    image: String!
+    status: String!
+    commands: [Command!]
+}
+
+type Command {
+    id: ID!
+    number: Int!
+    instruction: String!
+    std_out: [String]
+    std_err: [String]
 }
 
 type RootQuery {
@@ -24,11 +42,9 @@ type RootQuery {
 
     getJob(id: ID!): Job!
 
-    getRuns: [Run]!
-
-    getRun(id: ID!): Run!
-
     runJob(id: ID!): Run!
+
+    getRun(uuid: String!): Run!
 
 }
 

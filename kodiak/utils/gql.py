@@ -1,15 +1,4 @@
-from pathlib import Path
-
 import graphql
-
-from bootstrap import resources_root
-
-
-def get_schema_def():
-    schema_graphqls_path = Path(resources_root, 'schema.graphqls').absolute()
-
-    with open(str(schema_graphqls_path), 'r') as f:
-        return f.read()
 
 
 def build_executable_schema(schema_definition, resolvers):

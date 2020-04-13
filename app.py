@@ -1,15 +1,14 @@
-from docker.errors import APIError
-import os
 from os import path
 from pathlib import Path
 
-from flask import Flask, request, jsonify, send_from_directory
+from docker.errors import APIError
+from flask import Flask, jsonify, send_from_directory, request
 from flask_graphql import GraphQLView
+from fxq.core.beans.factory.annotation import Autowired
 
-from bootstrap import web_root, job_service, docker_service
-from kodiak.agent.model.job import Job
-from kodiak.agent.model.run import Run
-from kodiak.agent.model.status import Health
+from bootstrap import web_root
+from kodiak.model.job import Job
+from kodiak.model.status import Health
 from kodiak.server.gql import schema
 
 app = Flask(__name__, root_path=web_root)
@@ -37,16 +36,19 @@ def web(file):
 
 @app.route('/api/request', methods=['POST'])
 def start():
-    job: Job = Job.of_dict(request.json)
-    run: Run = job_service.process_request(job)
-    return jsonify(
-        run.to_dict()
-    )
+    job_service = Autowired("job_service")
+    job: Job = Job()
+    job.id = request.json["id"]
+    job.name = request.json["name"]
+    job.url = request.json["url"]
+    runUuid = job_service.process_request(job)
+    return jsonify({"uuid": runUuid})
 
 
 @app.route('/api/health', methods=['GET'])
 def check_health():
     try:
+        docker_service = Autowired("job_service")
         docker_service.list_containers()
         return jsonify(Health("UP").to_dict())
     except ConnectionError as e:

@@ -2,12 +2,14 @@ import logging
 
 from docker import DockerClient, from_env
 from docker.models.containers import Container
+from fxq.core.stereotype import Service
 
 import constants
 
 LOGGER = logging.getLogger(__name__)
 
 
+@Service(name="docker_service")
 class DockerService:
 
     def __init__(self):

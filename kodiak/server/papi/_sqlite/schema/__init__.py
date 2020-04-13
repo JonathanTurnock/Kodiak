@@ -2,24 +2,26 @@ import logging
 from typing import List
 
 import yaml
+from fxq.core.stereotype import Component
 
-from kodiak.server.papi.schema.dao import SchemaDao
-from kodiak.server.papi.schema.model import ChangeSet
+from kodiak.server.papi._sqlite.schema.dao import SchemaDao
+from kodiak.server.papi._sqlite.schema.model import ChangeSet
 
 LOGGER = logging.getLogger(__name__)
 
 
+@Component(name="schema_interface")
 class SchemaInterface:
-    def __init__(self, schema_dao: SchemaDao):
-        self._available_changesets: List[ChangeSet] = SchemaInterface._get_available_changesets()
-        self._schema_dao = schema_dao
+    def __init__(self):
+        self._available_changesets: List[ChangeSet] = self._get_available_changesets()
 
     def check_for_updates(self):
-        [self._schema_dao.apply_changeset(cs) for cs in self._available_changesets if
-         cs.is_newer_than(self._get_current_version())]
+        [SchemaDao.apply_changeset(cs) for cs in self._available_changesets if
+         cs.is_newer_than(SchemaInterface._get_current_version())]
 
-    def _get_current_version(self):
-        return self._schema_dao.get_current_version()
+    @staticmethod
+    def _get_current_version():
+        return SchemaDao.get_current_version()
 
     @staticmethod
     def _get_available_changesets():

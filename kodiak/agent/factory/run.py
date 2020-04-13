@@ -2,15 +2,15 @@ from pathlib import Path
 
 import yaml
 
-from kodiak.agent.model.job import Job
-from kodiak.agent.model.run import Run, Command, Step
+from kodiak.agent.run import Run, Command, Step
 from kodiak.agent.service.run import RunException
+from kodiak.model.job import Job
 
 
 class RunFactory:
 
     @staticmethod
-    def prepare(job: Job):
+    def prepare(job: Job) -> Run:
         return Run(job)
 
     @staticmethod
