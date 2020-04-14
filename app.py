@@ -36,7 +36,7 @@ def web(file):
 
 @app.route('/api/request', methods=['POST'])
 def start():
-    run_uuid = AgentInterface.run_job(int(request.json["uuid"]), str(request.json["name"]), str(request.json["url"]))
+    run_uuid = AgentInterface.run_job(str(request.json["uuid"]), str(request.json["name"]), str(request.json["url"]))
     return jsonify({"uuid": run_uuid})
 
 
