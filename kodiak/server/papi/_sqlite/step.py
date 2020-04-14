@@ -3,7 +3,7 @@ from typing import Tuple, List
 
 from kodiak.model.run import Status
 from kodiak.server.papi._sqlite.connection_factory import sql_commit, sql_fetch, FetchOneException
-from kodiak.server.papi._sqlite.exception import NoResultException
+from kodiak.server.papi.exception import NoResultException
 
 LOGGER = logging.getLogger(__name__)
 

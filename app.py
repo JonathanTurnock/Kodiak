@@ -7,7 +7,7 @@ from flask_graphql import GraphQLView
 from fxq.core.beans.factory.annotation import Autowired
 
 from bootstrap import web_root
-from kodiak.model.job import Job
+from kodiak.agent import AgentInterface
 from kodiak.model.status import Health
 from kodiak.server.gql import schema
 
@@ -36,13 +36,8 @@ def web(file):
 
 @app.route('/api/request', methods=['POST'])
 def start():
-    job_service = Autowired("job_service")
-    job: Job = Job()
-    job.id = request.json["id"]
-    job.name = request.json["name"]
-    job.url = request.json["url"]
-    runUuid = job_service.process_request(job)
-    return jsonify({"uuid": runUuid})
+    run_uuid = AgentInterface.run_job(int(request.json["uuid"]), str(request.json["name"]), str(request.json["url"]))
+    return jsonify({"uuid": run_uuid})
 
 
 @app.route('/api/health', methods=['GET'])

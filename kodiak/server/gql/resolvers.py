@@ -1,37 +1,31 @@
-from typing import List
-
 from fxq.core.beans.factory.annotation import Autowired
 
-from kodiak.agent.service.job import JobService
+from kodiak.agent import AgentInterface
 from kodiak.model.job import Job
-from kodiak.model.run import Run, Step, Command
+from kodiak.model.run import Run
 from kodiak.server.gql.schema_adapter import to_gql_schema
-from kodiak.server.papi.repos import JobRepository, RunRepository, StepRepository, CommandRepository
+from kodiak.server.papi.repos import JobRepository, RunRepository
 
 _job_repository: JobRepository = Autowired("job_repository")
 _run_repository: RunRepository = Autowired("run_repository")
-_step_repository: StepRepository = Autowired("step_repository")
-_command_repository: CommandRepository = Autowired("command_repository")
-_job_service: JobService = Autowired("job_service")
 
 
 def add_job(value, info, **args):
-    job = Job()
-    job.name = args["name"]
-    job.url = args["url"]
+    job = Job(name=args["name"], url=args["url"])
     job = _job_repository.save(job)
     return to_gql_schema(job)
 
 
 def start_job(value, info, **args):
-    job: Job = _job_repository.find_by_id(args["id"])
-    run_uuid = _job_service.process_request(job)
+    job: Job = _job_repository.find_by_uuid(args["uuid"])
+    run_uuid = AgentInterface.run_job(job.uuid, job.name, job.url)
     return to_gql_schema(_run_repository.find_by_uuid(run_uuid))
 
 
 def get_job_by_id(value, info, **args):
     job = _job_repository.find_by_id(args["id"])
-    return to_gql_schema(job)
+    job = to_gql_schema(job)
+    return
 
 
 def get_jobs(value, info, **args):
@@ -39,22 +33,8 @@ def get_jobs(value, info, **args):
 
 
 def get_run(value, info, **args):
-    def get_commands(step_id):
-        commands: List[Command] = _command_repository.find_all_by_step_id(step_id)
-        return [to_gql_schema(command) for command in commands]
-
-    def get_steps(run_id):
-        steps: List[Step] = _step_repository.find_all_by_run_id(run_id)
-        steps_resp = []
-        for step in steps:
-            step_resp = to_gql_schema(step)
-            step_resp["commands"] = get_commands(step.id)
-            steps_resp.append(step_resp)
-        return steps_resp
-
     run: Run = _run_repository.find_by_uuid(args["uuid"])
     response = to_gql_schema(run)
-    response["steps"] = get_steps(run.id)
     return response
 
 

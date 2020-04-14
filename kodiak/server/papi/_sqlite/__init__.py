@@ -22,8 +22,8 @@ class SqliteJobRepository(JobRepository):
     def save(self, job: Job) -> Job:
         job_dto = JobDto(
             id=job.id,
-            name=job.name,
-            url=job.url
+            name=job._name,
+            url=job._url
         )
         job_dto: JobDto = JobDao.save(job_dto)
         if job.id is None:

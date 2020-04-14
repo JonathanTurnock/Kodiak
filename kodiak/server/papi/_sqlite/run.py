@@ -4,7 +4,7 @@ from typing import Tuple
 
 from kodiak.model.run import Run
 from kodiak.server.papi._sqlite.connection_factory import sql_fetch, FetchOneException, sql_commit
-from kodiak.server.papi._sqlite.exception import NoResultException
+from kodiak.server.papi.exception import NoResultException
 
 LOGGER = logging.getLogger(__name__)
 

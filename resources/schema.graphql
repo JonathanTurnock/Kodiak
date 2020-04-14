@@ -1,18 +1,30 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
 schema {
     query: RootQuery
     mutation: RootMutation
 }
 
+type RootMutation {
+    addJob(name: String!, url: String!): Job!
+}
+
+type RootQuery {
+    getJob(uuid: ID!): Job!
+    getJobs: [Job]!
+    getRun(uuid: String!): Run!
+    runJob(uuid: ID!): Run!
+}
+
 type Job {
-    id: ID!
+    uuid: ID!
     name: String!
     url: String!
 }
 
 type Run {
-    id: ID!
+    uuid: ID!
     job: Job!
-    uuid: String!
     status: String
     started: String
     ended: String
@@ -20,36 +32,16 @@ type Run {
 }
 
 type Step {
-    id: ID!
-    number: Int!
     name: String!
     image: String!
+    number: Int!
     status: String!
     commands: [Command!]
 }
 
 type Command {
-    id: ID!
-    number: Int!
     instruction: String!
-    std_out: [String]
+    number: Int!
     std_err: [String]
-}
-
-type RootQuery {
-
-    getJobs: [Job]!
-
-    getJob(id: ID!): Job!
-
-    runJob(id: ID!): Run!
-
-    getRun(uuid: String!): Run!
-
-}
-
-type RootMutation {
-
-    addJob(name: String!, url: String!): Job!
-
+    std_out: [String]
 }

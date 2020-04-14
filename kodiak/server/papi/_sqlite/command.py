@@ -4,7 +4,7 @@ from typing import List, Tuple
 import jsonpickle
 
 from kodiak.server.papi._sqlite.connection_factory import sql_commit, FetchOneException, sql_fetch
-from kodiak.server.papi._sqlite.exception import NoResultException
+from kodiak.server.papi.exception import NoResultException
 
 LOGGER = logging.getLogger(__name__)
 
