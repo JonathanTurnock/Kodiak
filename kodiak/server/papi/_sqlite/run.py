@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Tuple
 
 from kodiak.model.run import Run
+from kodiak.server.papi._sqlite._interfaces import Dto
 from kodiak.server.papi._sqlite.connection_factory import sql_fetch, FetchOneException, sql_commit
 from kodiak.server.papi.exception import NoResultException
 
@@ -20,7 +21,7 @@ def run_dto_of_run(run: Run):
     )
 
 
-class RunDto(object):
+class RunDto(Dto):
     def __init__(
             self,
             id: int = None,
@@ -36,6 +37,16 @@ class RunDto(object):
         self.status: str = status
         self.started: datetime = started
         self.ended: datetime = ended
+
+    def parameterize(self) -> dict:
+        return {
+            "id": self.id,
+            "job_id": self.job_id,
+            "uuid": self.uuid,
+            "status": self.status,
+            "started": self.started,
+            "ended": self.ended
+        }
 
 
 class RunDao:

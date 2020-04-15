@@ -9,3 +9,5 @@ create table command
 );
 
 create unique index command_id_uindex on command (id);
+
+create unique index command_step_id_number_uindex on command (step_id, number);

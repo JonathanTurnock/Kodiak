@@ -7,6 +7,9 @@ schema {
 
 type RootMutation {
     addJob(name: String!, url: String!): Job!
+    updateJob(uuid: ID!,name: String!, url: String!): Job!
+    removeJob(uuid: ID!): Boolean
+    removeRun(uuid: ID!): Boolean
 }
 
 type RootQuery {

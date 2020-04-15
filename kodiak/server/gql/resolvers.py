@@ -16,6 +16,18 @@ def add_job(value, info, **args):
     return to_gql_schema(job)
 
 
+def update_job(value, info, **args):
+    existing_job = _job_repository.find_by_uuid(args["uuid"])
+    job = Job(uuid=args["uuid"], name=args["name"], url=args["url"])
+    _job_repository.save(job)
+    return to_gql_schema(job)
+
+
+def remove_job(value, info, **args):
+    _job_repository.delete_by_uuid(args["uuid"])
+    return True
+
+
 def start_job(value, info, **args):
     job: Job = _job_repository.find_by_uuid(args["uuid"])
     run_uuid = AgentInterface.run_job(job.uuid, job.name, job.url)
@@ -38,6 +50,11 @@ def get_run(value, info, **args):
     return response
 
 
+def remove_run(value, info, **args):
+    _run_repository.delete_by_uuid(args["uuid"])
+    return True
+
+
 resolver_map = {
     'RootQuery': {
         'getJobs': get_jobs,
@@ -47,5 +64,8 @@ resolver_map = {
     },
     'RootMutation': {
         'addJob': add_job,
+        'updateJob': update_job,
+        'removeJob': remove_job,
+        'removeRun': remove_run
     }
 }

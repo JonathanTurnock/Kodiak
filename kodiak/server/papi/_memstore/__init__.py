@@ -19,6 +19,10 @@ class InMemoryJobRepository(JobRepository):
         self._jobs[job.uuid] = job
         return job
 
+    def delete_by_uuid(self, uuid: str) -> None:
+        self.find_by_uuid(uuid)
+        del self._jobs[uuid]
+
     def find_all(self) -> List[Job]:
         return [job for job in self._jobs.values()]
 
@@ -37,6 +41,10 @@ class InMemoryRunRepository(RunRepository):
     def save(self, run: Run) -> Run:
         self._runs[run.uuid] = copy.deepcopy(run)
         return self._runs[run.uuid]
+
+    def delete_by_uuid(self, uuid: str) -> None:
+        self.find_by_uuid(uuid)
+        del self._runs[uuid]
 
     def find_by_uuid(self, uuid: str) -> Run:
         if uuid not in self._runs.keys():

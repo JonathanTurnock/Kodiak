@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 import jsonpickle
 
+from kodiak.server.papi._sqlite._interfaces import Dto
 from kodiak.server.papi._sqlite.connection_factory import sql_commit, FetchOneException, sql_fetch
 from kodiak.server.papi.exception import NoResultException
 
@@ -20,7 +21,7 @@ def command_dto_of_command(command):
     )
 
 
-class CommandDto(object):
+class CommandDto(Dto):
     def __init__(
             self,
             id: int = None,
@@ -37,10 +38,20 @@ class CommandDto(object):
         self.std_out: List[str] = std_out
         self.std_err: List[str] = std_err
 
+    def parameterize(self) -> dict:
+        return {
+            "id": self.id,
+            "step_id": self.step_id,
+            "number": self.number,
+            "instruction": self.instruction,
+            "std_out": jsonpickle.encode(self.std_out),
+            "std_err": jsonpickle.encode(self.std_err),
+        }
+
 
 class CommandDao:
-    _INSERT_NEW_COMMAND = "insert into command (step_id, number, instruction, std_out, std_error) values (?, ?, ?, ?, ?)"
-    _UPDATE_EXISTING_COMMAND = "update command set step_id=?, number=?, instruction=?, std_out=?, std_error=? where id=?"
+    _INSERT_NEW_COMMAND = "insert into command (step_id, number, instruction, std_out, std_error) values (:step_id, :number, :instruction, :std_out, :std_err)"
+    _UPDATE_EXISTING_COMMAND = "update command set step_id=:step_id, number=:number, instruction=:instruction, std_out=:std_out, std_error=:std_err where id=:id"
     _FIND_BY_ID = "select id, step_id, number, instruction, std_out, std_error from command where id=?"
     _FIND_BY_STEP_ID = "select id, step_id, number, instruction, std_out, std_error from command where step_id=?"
 
@@ -54,16 +65,11 @@ class CommandDao:
     @staticmethod
     def save(command: CommandDto) -> CommandDto:
         if command.id is None:
-            with sql_commit(CommandDao._INSERT_NEW_COMMAND,
-                            [command.step_id, command.number, command.instruction, jsonpickle.encode(command.std_out),
-                             jsonpickle.encode(command.std_err)]) as last_row_id:
+            with sql_commit(CommandDao._INSERT_NEW_COMMAND, command.parameterize()) as last_row_id:
                 LOGGER.debug(f"Added new command with with id: {last_row_id}")
                 command.id = last_row_id
         else:
-            with sql_commit(CommandDao._UPDATE_EXISTING_COMMAND,
-                            [command.step_id, command.number, command.instruction, jsonpickle.encode(command.std_out),
-                             jsonpickle.encode(command.std_err),
-                             command.id]) as last_row_id:
+            with sql_commit(CommandDao._UPDATE_EXISTING_COMMAND, command.parameterize()) as last_row_id:
                 LOGGER.debug(f"Updated existing command with with id: {last_row_id}")
         return CommandDao.find_by_id(command.id)
 

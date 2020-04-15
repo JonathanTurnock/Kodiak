@@ -1,32 +1,23 @@
 import pathlib
 
+import yaml
 from setuptools import setup
 
+with open('app.yml', 'r') as app_ymlf:
+    config = yaml.load(app_ymlf, Loader=yaml.FullLoader)
+
 setup(
-    name='kodiak-ae-agent',
-    version='0.0.17-SNAPSHOT',
-    packages=[
-        'kodiak.agent',
-        'kodiak.agent.callback',
-        'kodiak.agent.factory',
-        'kodiak.agent.model',
-        'kodiak.agent.service',
-        'kodiak.server'
-    ],
-    url='https://bitbucket.org/fxqlabs-oss/kodiak/',
-    license='MIT',
-    author='Jonathan Turnock',
-    author_email='jonathan.turnock@outlook.com',
-    description='Docker host orchestration app to run pipelines',
+    name=config["app"]["name"],
+    version=config["app"]["version"],
+    packages=config["app"]["setup"]["packages"],
+    url=config["app"]["url"],
+    license=config["app"]["license"],
+    author=config["app"]["author"]["name"],
+    author_email=config["app"]["author"]["email"],
+    description=config["app"]["description"],
     long_description=(pathlib.Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
-    install_requires=[
-        'click',
-        'docker',
-        'flask',
-        'gitpython',
-        'pyyaml'
-    ],
+    install_requires=config["app"]["setup"]["install_requires"],
     entry_points={
         'console_scripts': ['kodiak=kodiak.cli:main'],
     }

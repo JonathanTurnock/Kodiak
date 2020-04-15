@@ -2,6 +2,7 @@ import logging
 from typing import Tuple, List
 
 from kodiak.model.run import Status
+from kodiak.server.papi._sqlite._interfaces import Dto
 from kodiak.server.papi._sqlite.connection_factory import sql_commit, sql_fetch, FetchOneException
 from kodiak.server.papi.exception import NoResultException
 
@@ -19,7 +20,7 @@ def step_dto_of_step(step):
     )
 
 
-class StepDto(object):
+class StepDto(Dto):
     def __init__(
             self,
             id: int = None,
@@ -35,6 +36,16 @@ class StepDto(object):
         self.name: str = name
         self.image: str = image
         self.status: str = status.name
+
+    def parameterize(self) -> dict:
+        return {
+            "id": self.id,
+            "run_id": self.run_id,
+            "number": self.number,
+            "name": self.name,
+            "image": self.image,
+            "status": self.status
+        }
 
 
 class StepDao:

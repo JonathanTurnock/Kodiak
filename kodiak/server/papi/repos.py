@@ -12,6 +12,10 @@ class JobRepository(ABC):
         pass
 
     @abstractmethod
+    def delete_by_uuid(self, uuid: str) -> None:
+        pass
+
+    @abstractmethod
     def find_all(self) -> List[Job]:
         pass
 
@@ -26,6 +30,10 @@ class RunRepository(ABC):
     def save(self, run: Run) -> Run:
         pass
 
+    @abstractmethod
+    def delete_by_uuid(self, uuid: str) -> None:
+        pass
+    
     @abstractmethod
     def find_by_uuid(self, uuid: str) -> Run:
         pass

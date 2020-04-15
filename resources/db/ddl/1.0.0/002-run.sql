@@ -2,7 +2,7 @@ create table run
 (
     id      INTEGER not null constraint run_pk primary key autoincrement,
     job_id  INTEGER not null constraint run_job_id_fk references job on update cascade on delete cascade,
-    uuid    TEXT    not null,
+    uuid    TEXT    not null constraint run_pk_2 unique,
     status  TEXT,
     started TIMESTAMP,
     ended   TIMESTAMP

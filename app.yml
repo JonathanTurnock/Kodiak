@@ -1,0 +1,28 @@
+app:
+  name: kodiak
+  version: 1.0.0-SNAPSHOT
+  url: https://bitbucket.org/fxqlabs-oss/kodiak/
+  license: MIT
+  description: Docker host orchestration app to run pipelines
+  author:
+    name: Jonathan Turnock
+    email: jonathan.turnock@outlook.com
+  setup:
+    packages:
+      - kodiak.agent
+      - kodiak.agent.callback
+      - kodiak.agent.factory
+      - kodiak.agent.model
+      - kodiak.agent.service
+      - kodiak.server
+    install_requires:
+      - click
+      - docker
+      - flask
+      - gitpython
+      - pyyaml
+datasource:
+  # Available Datasource Drivers:
+  #   kodiak.server.papi._sqlite - Sqlite Datastore
+  #   kodiak.server.papi._memstore - In Memory Database
+  driver: kodiak.server.papi._sqlite

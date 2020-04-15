@@ -3,7 +3,7 @@ import sqlite3
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 from constants import PIPELINE_BASE
 
@@ -24,7 +24,7 @@ def get_connection():
 
 
 @contextmanager
-def sql_fetch(query: str, params: List[any], row_mapper, size=0):
+def sql_fetch(query: str, params: List[any] or Dict, row_mapper, size=0):
     connection = get_connection()
     try:
         LOGGER.debug(f"Executing SQL Query:\nQUERY:{query}\nPARAMS: {params}")
@@ -47,7 +47,7 @@ def sql_fetch(query: str, params: List[any], row_mapper, size=0):
 
 
 @contextmanager
-def sql_commit(statement: str, params: List[str]):
+def sql_commit(statement: str, params: List[any] or Dict):
     connection = get_connection()
     try:
         LOGGER.debug(f"Executing SQL Statement:\nQUERY:{statement}\nPARAMS: {params}")

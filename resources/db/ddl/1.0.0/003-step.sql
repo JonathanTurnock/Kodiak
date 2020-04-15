@@ -10,3 +10,4 @@ create table step
 
 create unique index step_id_uindex on step (id);
 
+create unique index step_run_id_number_uindex on step (run_id, number);

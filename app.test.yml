@@ -1,0 +1,5 @@
+datasource:
+  # Available Datasource Drivers:
+  #   kodiak.server.papi._sqlite - Sqlite Datastore
+  #   kodiak.server.papi._memstore - In Memory Database
+  driver: kodiak.server.papi._memstore
