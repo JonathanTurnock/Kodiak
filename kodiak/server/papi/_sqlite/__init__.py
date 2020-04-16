@@ -1,3 +1,4 @@
+import sqlite3
 from typing import List
 
 from fxq.core.beans.factory.annotation import Autowired
@@ -11,6 +12,11 @@ from kodiak.server.papi._sqlite.run import RunDto, run_dto_of_run, RunDao
 from kodiak.server.papi._sqlite.schema import SchemaInterface
 from kodiak.server.papi._sqlite.step import step_dto_of_step, StepDao, StepDto
 from kodiak.server.papi.repos import JobRepository, RunRepository
+from kodiak.utils.version import is_later_version
+
+sqlite_version = sqlite3.sqlite_version
+if not is_later_version(sqlite_version, "3.24.0"):
+    raise Exception(f"SQLite version {sqlite_version} is not valid, requires minimum of 3.24.0")
 
 schema_interface: SchemaInterface = Autowired("schema_interface")
 schema_interface.check_for_updates()
