@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from typing import List
 
@@ -14,7 +15,10 @@ from kodiak.server.papi._sqlite.step import step_dto_of_step, StepDao, StepDto
 from kodiak.server.papi.repos import JobRepository, RunRepository
 from kodiak.utils.version import is_later_version
 
+LOGGER = logging.getLogger(__name__)
+
 sqlite_version = sqlite3.sqlite_version
+LOGGER.info(f"Running SQLite Version {sqlite_version}")
 if not is_later_version(sqlite_version, "3.24.0"):
     raise Exception(f"SQLite version {sqlite_version} is not valid, requires minimum of 3.24.0")
 
