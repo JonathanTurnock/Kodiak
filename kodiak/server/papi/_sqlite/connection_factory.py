@@ -2,10 +2,9 @@ import logging
 import sqlite3
 import time
 from contextlib import contextmanager
-from pathlib import Path
 from typing import List, Dict
 
-from constants import PIPELINE_BASE
+from kodiak.utils.paths import database_path
 
 LOGGER = logging.getLogger(__name__)
 
@@ -17,7 +16,11 @@ class FetchOneException(Exception):
 def get_connection():
     LOGGER.debug("Obtaining Database Connection")
     t0 = time.time()
-    connection = sqlite3.connect(Path(PIPELINE_BASE, "kodiak.db").absolute())
+    try:
+        connection = sqlite3.connect(database_path)
+    except sqlite3.OperationalError as e:
+        LOGGER.error(f"Unable to Open database connection at {database_path}")
+        raise Exception(f"Unable to Open database connection at {database_path}") from e
     t1 = time.time()
     LOGGER.debug(f"Obtained Database Connection in {t1 - t0}")
     return connection

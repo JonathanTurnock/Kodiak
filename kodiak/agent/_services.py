@@ -9,12 +9,13 @@ from fxq.core.beans.factory.annotation import Autowired
 from fxq.core.stereotype import Service
 from git import Repo
 
-import constants
+from bootstrap import PIPELINE_MOUNT_TARGET, PROJECTS_FOLDER, PIPELINE_YML_NAME
 from kodiak.agent._errors import RunException, StdErrException, StepException
 from kodiak.agent._tasks import RunTask
 from kodiak.agent._tasks import Step, Command
 from kodiak.model.job import Job
 from kodiak.utils.id import new_string_id
+from kodiak.utils.paths import get_pipeline_base, pipeline_base
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ class DockerService:
             privileged=True,
             stream=True,
             demux=True,
-            workdir=constants.PIPELINE_MOUNT_TARGET
+            workdir=PIPELINE_MOUNT_TARGET
         )
         return response.output
 
@@ -71,7 +72,7 @@ class DockerService:
             detach=True,
             volumes={
                 workspace_path: {
-                    'bind': constants.PIPELINE_MOUNT_TARGET,
+                    'bind': PIPELINE_MOUNT_TARGET,
                     'mode': 'rw'
                 }
             }
@@ -164,7 +165,7 @@ class JobService:
     def __init__(self, run_service=Autowired("run_service"), docker_service=Autowired("docker_service")):
         self.run_service = run_service
         self.docker_service = docker_service
-        LOGGER.info("System Pipeline Base set to %s" % constants.PIPELINE_BASE)
+        LOGGER.info("System Pipeline Base set to %s" % pipeline_base)
 
     def process_request(self, job: Job) -> str:
         """
@@ -183,7 +184,7 @@ class JobService:
         workspace_path: str = JobService._get_workspace_path()
         JobService._clone_repo(run.get_run().job.url, workspace_path)
         LOGGER.debug("Cloned Repo into Workspace %s" % workspace_path)
-        run.configure_from_yml_file("%s/%s" % (workspace_path, constants.PIPELINE_YML_NAME))
+        run.configure_from_yml_file("%s/%s" % (workspace_path, PIPELINE_YML_NAME))
         LOGGER.info("Starting a new run thread for uuid %s" % run.uuid)
         self.run_service.start(run, workspace_path)
         shutil.rmtree(workspace_path)
@@ -192,8 +193,8 @@ class JobService:
     @staticmethod
     def _get_workspace_path() -> str:
         return "%s/%s/%s" % (
-            constants.PIPELINE_BASE,
-            constants.PROJECTS_FOLDER,
+            get_pipeline_base(),
+            PROJECTS_FOLDER,
             new_string_id()
         )
 
