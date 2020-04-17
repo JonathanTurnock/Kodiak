@@ -1,4 +1,5 @@
 import logging
+from sqlite3 import IntegrityError
 from typing import List, Tuple
 
 from kodiak.server.papi._sqlite._interfaces import Dto
@@ -47,9 +48,9 @@ class JobDto(Dto):
 
 
 class JobDao:
-    _INSERT_OR_UPDATE_NEW_JOB = "insert into job (uuid, name, url) values (:uuid, :name, :url) on conflict(uuid) do update set uuid=:uuid, name=:name, url=:url"
+    _INSERT_NEW_JOB = "insert or replace into job (uuid, name, url) values (:uuid, :name, :url)"
+    _UPDATE_JOB = "update job set uuid=:uuid, name=:name, url=:url where id=:id"
     _REMOVE_JOB = "delete from job where id=?"
-    _UPDATE_EXISTING_JOB = "update job set uuid=?, name=?, url=? where id=?"
     _FIND_JOB_BY_ID = "select id, uuid, name, url from job where id = ?"
     _FIND_JOB_BY_UUID = "select id, uuid, name, url from job where uuid = ?"
     _FIND_ALL_JOBS = "select id, uuid, name, url from job"
@@ -61,14 +62,30 @@ class JobDao:
 
     @staticmethod
     def save(job: JobDto) -> JobDto:
-        with sql_commit(JobDao._INSERT_OR_UPDATE_NEW_JOB, job.parameterize()) as last_row_id:
+        try:
+            return JobDao._do_insert(job)
+        except IntegrityError as e:
+            return JobDao._do_update(job)
+
+    @staticmethod
+    def _do_insert(job: JobDto) -> JobDto:
+        with sql_commit(JobDao._INSERT_NEW_JOB, job.parameterize()) as last_row_id:
             if last_row_id > 0:
-                LOGGER.info(f"Added new job with id: {last_row_id}")
+                LOGGER.info(f"Added or replaced job with id: {last_row_id}")
                 return JobDao.find_job_by_id(last_row_id)
-            elif last_row_id == 0:
-                job_dto = JobDao.find_job_by_uuid(job.uuid)
-                LOGGER.info(f"Updated existing job with id: {job_dto.id}")
-                return job_dto
+
+    @staticmethod
+    def _do_update(job: JobDto) -> JobDto:
+        existing_row = JobDao.find_job_by_uuid(job.uuid)
+        updated_row = JobDto(
+            id=existing_row.id,
+            uuid=existing_row.uuid,
+            name=job.name if job.name is not None else existing_row.name,
+            url=job.url if job.url is not None else existing_row.url
+        )
+        with sql_commit(JobDao._UPDATE_JOB, updated_row.parameterize()) as last_row_id:
+            LOGGER.info(f"Updated existing job with id: {existing_row.id}")
+            return updated_row
 
     @staticmethod
     def delete_by_uuid(uuid: str) -> None:
