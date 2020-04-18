@@ -34,8 +34,8 @@ def start_job(value, info, **args):
     return to_gql_schema(_run_repository.find_by_uuid(run_uuid))
 
 
-def get_job_by_id(value, info, **args):
-    job = _job_repository.find_by_id(args["id"])
+def get_job_by_uuid(value, info, **args):
+    job = _job_repository.find_by_uuid(args["uuid"])
     job = to_gql_schema(job)
     return
 
@@ -50,6 +50,10 @@ def get_run(value, info, **args):
     return response
 
 
+def get_runs_for_job(value, info, **args):
+    return [to_gql_schema(run) for run in _run_repository.find_all_by_job_uuid(args["uuid"])]
+
+
 def remove_run(value, info, **args):
     _run_repository.delete_by_uuid(args["uuid"])
     return True
@@ -58,7 +62,8 @@ def remove_run(value, info, **args):
 resolver_map = {
     'RootQuery': {
         'getJobs': get_jobs,
-        'getJob': get_job_by_id,
+        'getJob': get_job_by_uuid,
+        'getRunsForJob': get_runs_for_job,
         'runJob': start_job,
         'getRun': get_run
     },

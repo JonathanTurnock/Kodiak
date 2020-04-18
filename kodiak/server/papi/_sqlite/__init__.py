@@ -97,3 +97,8 @@ class SqliteRunRepository(RunRepository):
             ended=run_dto.ended,
             steps=get_steps_for_run(run_dto.id)
         )
+
+    def find_all_by_job_uuid(self, uuid: str) -> List[Run]:
+        job_dto: JobDto = JobDao.find_job_by_uuid(uuid)
+        run_dtos: List[RunDto] = RunDao.find_all_by_job_id(job_dto.id)
+        return [self.find_by_uuid(dto.uuid) for dto in run_dtos]

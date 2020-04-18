@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from unittest import TestCase
 
 import requests
@@ -34,6 +35,15 @@ remove_job = lambda uuid: send_query('''\
 mutation {
     removeJob(uuid: "%s")
 }''' % (uuid,))
+
+run_job = lambda uuid: send_query('''\
+{
+  runJob(uuid: "%s") {
+    uuid
+    status
+  }
+}
+''' % (uuid,))
 
 
 def send_query(query: str, variables: dict = None):
@@ -113,3 +123,15 @@ class RemoveJobsTests(TestCase):
     def test_remove_job_is_not_in_jobs_list(self):
         remove_job(self.added_job_uuid)
         self.assertTrue(job_is_not_present(self.added_job_uuid))
+
+
+class RunJobsTests(TestCase):
+
+    def test_run_jobs(self):
+        for i in range(0, 5):
+            add_job_r = add_job("AEP Hello World", "git@bitbucket.org:fxqlabs/aep-hello-world.git")
+            added_job_uuid = add_job_r["addJob"]["uuid"]
+            for j in range(0, 100):
+                run_job(added_job_uuid)
+
+            time.sleep(60)

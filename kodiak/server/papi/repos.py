@@ -33,7 +33,11 @@ class RunRepository(ABC):
     @abstractmethod
     def delete_by_uuid(self, uuid: str) -> None:
         pass
-    
+
     @abstractmethod
     def find_by_uuid(self, uuid: str) -> Run:
+        pass
+
+    @abstractmethod
+    def find_all_by_job_uuid(self, uuid: str) -> List[Run]:
         pass

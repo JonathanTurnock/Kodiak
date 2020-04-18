@@ -50,3 +50,6 @@ class InMemoryRunRepository(RunRepository):
         if uuid not in self._runs.keys():
             raise NoResultException(f"No Run with UUID {uuid}")
         return self._runs[uuid]
+
+    def find_all_by_job_uuid(self, uuid: str) -> List[Run]:
+        return [run for run in self._runs.values() if run.job.uuid == uuid]

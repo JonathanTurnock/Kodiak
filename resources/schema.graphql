@@ -16,6 +16,7 @@ type RootQuery {
     getJob(uuid: ID!): Job!
     getJobs: [Job]!
     getRun(uuid: String!): Run!
+    getRunsForJob(uuid: ID!): [Run]
     runJob(uuid: ID!): Run!
 }
 

@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from sqlite3 import IntegrityError
-from typing import Tuple
+from typing import Tuple, List
 
 from kodiak.server.papi._sqlite._interfaces import Dto
 from kodiak.server.papi._sqlite.connection_factory import sql_fetch, FetchOneException, sql_commit
@@ -44,6 +44,7 @@ class RunDao:
     _UPDATE_RUN = "update run set job_id=:job_id, uuid=:uuid, status=:status, started=:started, ended=:ended where id=:id"
     _FIND_BY_ID = "select id, job_id, uuid, status, started, ended from run where id=?"
     _FIND_BY_UUID = "select id, job_id, uuid, status, started, ended from run where uuid=?"
+    _FIND_ALL_BY_JOB_ID = "select id, job_id, uuid, status, started, ended from run where job_id=?"
 
     @staticmethod
     def save(run: RunDto) -> RunDto:
@@ -60,13 +61,18 @@ class RunDao:
         except FetchOneException:
             raise NoResultException(f"No Run Found with id: {id}") from None
 
-    @classmethod
-    def find_by_uuid(cls, uuid: str):
+    @staticmethod
+    def find_by_uuid(uuid: str) -> RunDto:
         try:
             with sql_fetch(RunDao._FIND_BY_UUID, [uuid], row_mapper=RunDao._map_full_row, size=1) as run_dto:
                 return run_dto
         except FetchOneException:
             raise NoResultException(f"No Run Found with uuid: {uuid}") from None
+
+    @staticmethod
+    def find_all_by_job_id(id: int) -> List[RunDto]:
+        with sql_fetch(RunDao._FIND_ALL_BY_JOB_ID, [id], row_mapper=RunDao._map_full_row, size=0) as run_dtos:
+            return run_dtos
 
     @staticmethod
     def delete(run: RunDto) -> None:
