@@ -12,10 +12,9 @@ from git import Repo
 from bootstrap import PIPELINE_MOUNT_TARGET, PROJECTS_FOLDER, PIPELINE_YML_NAME
 from kodiak.agent._errors import RunException, StdErrException, StepException
 from kodiak.agent._tasks import RunTask
-from kodiak.agent._tasks import Step, Command
 from kodiak.model.job import Job
 from kodiak.utils.id import new_string_id
-from kodiak.utils.paths import get_pipeline_base, pipeline_base
+from kodiak.utils.paths import get_working_dir, working_dir
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,6 +29,17 @@ class DockerService:
         return self._docker_client.containers.list()
 
     def provision(self, name: str, image: str, workspace_path: str = None) -> Container:
+        """
+        Provisions a docker container with the given name, based off the given image.
+
+        The Workspace is then mounted if provided allowing the files within the workspace to be accessed from within the
+        docker container.
+
+        :param name: Name for the Container
+        :param image: Image for the Container
+        :param workspace_path: Workspace to Mount into the Container
+        :return: Returns the running Container
+        """
         name = name.replace(" ", "_")
         image = image if ":" in image else image + ":latest"
         LOGGER.info("Pulling Container Image %s" % image)
@@ -41,6 +51,13 @@ class DockerService:
             return self._provision_with_volume(name, image, workspace_path)
 
     def run_command(self, container: Container, instruction: str):
+        """
+        Executes the given instruction on the container and returns the output.
+
+        :param container: Container to send the instruction to
+        :param instruction: Instruction to send via sh
+        :return: Returns the instruction output
+        """
         LOGGER.info("Running Container Command \"%s\"" % instruction)
         response = container.exec_run(
             ["/bin/sh", "-c", instruction],
@@ -52,6 +69,12 @@ class DockerService:
         return response.output
 
     def teardown(self, container: Container):
+        """
+        Tears the container down stopping it forcibly and removing it
+
+        :param container: Container to remove
+        :return: No Return Value
+        """
         LOGGER.debug("Starting Teardown")
         container.stop(timeout=1)
         container.remove()
@@ -88,75 +111,56 @@ class RunService:
     def start(self, run: RunTask, workspace_path: str):
         LOGGER.info("Executing Run uuid %s" % run.uuid)
         try:
-            self._do_run(run, workspace_path)
+            run.start()
+            for step in run.get_steps():
+                try:
+                    LOGGER.info("Setting up step %s" % step.name)
+                    run.start_step(step.number)
+                    container = None
+                    try:
+                        container = self._docker_service.provision(run.uuid, step.image, workspace_path)
+                        LOGGER.info("Running commands for step %s" % step.name)
+                        for command in step.commands:
+                            LOGGER.info("Running command %s" % command.instruction)
+                            output = self._docker_service.run_command(container, command.instruction)
+                            while True:
+                                try:
+                                    std_out, std_err = next(output)
+                                    if std_out:
+                                        run.add_output(step.number, command.number, std_out.decode())
+                                    if std_err:
+                                        run.add_error(step.number, command.number, std_err.decode())
+                                        raise StdErrException("Execution stopped due to command receiving stdErr")
+                                except StopIteration:
+                                    break
+                    except Exception as e:
+                        LOGGER.error(
+                            "Exception caught during step, marking as failed, set to Debug for the full stacktrace")
+                        LOGGER.debug(e)
+                        run.fail_step(step.number)
+                    finally:
+                        self._docker_service.teardown(container)
+
+                    if run.step_is_failed(step.number):
+                        raise StepException("Step aborted due to Failed Step Status")
+
+                    run.complete_step(step.number)
+                except Exception as e:
+                    LOGGER.error(
+                        "Error occurred in Step #%s - %s, failing run, set to Debug for the full stacktrace" % (
+                            step.number, step.name))
+                    LOGGER.debug(e)
+                    run.fail()
+                    break
+
+            if run.is_failed():
+                raise RunException("Run aborted due to Failed Run Status")
+
+            run.complete()
         except RunException:
             LOGGER.error("Run Failed, aborting remaining Steps")
             run.abort_pending_steps()
         LOGGER.info("Completed Executing the run %s" % run.uuid)
-
-    def _do_run(self, run: RunTask, workspace_path: str):
-        run.start()
-        for step in run.get_steps():
-            try:
-                self._do_step(run, step, workspace_path)
-            except Exception as e:
-                LOGGER.error("Error occurred in Step #%s - %s, failing run, set to Debug for the full stacktrace" % (
-                    step.number, step.name))
-                LOGGER.debug(e)
-                run.fail()
-                break
-
-        if run.is_failed():
-            raise RunException("Run aborted due to Failed Run Status")
-
-        run.complete()
-
-    def _do_step(self, run: RunTask, step: Step, workspace_path):
-        LOGGER.info("Setting up step %s" % step.name)
-        run.start_step(step.number)
-        container = None
-        try:
-            container = self._do_step_setup(step, workspace_path)
-            self._do_step_work(run, step, container)
-        except Exception as e:
-            LOGGER.error(
-                "Exception caught during step, marking as failed, set to Debug for the full stacktrace")
-            LOGGER.debug(e)
-            run.fail_step(step.number)
-        finally:
-            self._docker_service.teardown(container)
-
-        if run.step_is_failed(step.number):
-            raise StepException("Step aborted due to Failed Step Status")
-
-        run.complete_step(step.number)
-
-    def _do_step_setup(self, step: Step, workspace_path: str):
-        container = self._docker_service.provision(
-            step.run.uuid,
-            step.image,
-            workspace_path
-        )
-        return container
-
-    def _do_step_work(self, run: RunTask, step: Step, container: Container):
-        LOGGER.info("Running commands for step %s" % step.name)
-        for command in step.commands:
-            self._do_command(run, command, container)
-
-    def _do_command(self, run: RunTask, command: Command, container: Container):
-        LOGGER.info("Running command %s" % command.instruction)
-        output = self._docker_service.run_command(container, command.instruction)
-        while True:
-            try:
-                std_out, std_err = next(output)
-                if std_out:
-                    run.add_output(command.step.number, command.number, std_out.decode())
-                if std_err:
-                    run.add_error(command.step.number, command.number, std_err.decode())
-                    raise StdErrException("Execution stopped due to command receiving stdErr")
-            except StopIteration:
-                break
 
 
 @Service(name="job_service")
@@ -165,7 +169,7 @@ class JobService:
     def __init__(self, run_service=Autowired("run_service"), docker_service=Autowired("docker_service")):
         self.run_service = run_service
         self.docker_service = docker_service
-        LOGGER.info("System Pipeline Base set to %s" % pipeline_base)
+        LOGGER.info("System Pipeline Base set to %s" % working_dir)
 
     def process_request(self, job: Job) -> str:
         """
@@ -193,7 +197,7 @@ class JobService:
     @staticmethod
     def _get_workspace_path() -> str:
         return "%s/%s/%s" % (
-            get_pipeline_base(),
+            get_working_dir(),
             PROJECTS_FOLDER,
             new_string_id()
         )

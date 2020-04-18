@@ -48,17 +48,12 @@ class JobDto(Dto):
 
 
 class JobDao:
-    _INSERT_NEW_JOB = "insert or replace into job (uuid, name, url) values (:uuid, :name, :url)"
+    _INSERT_JOB = "insert into job (uuid, name, url) values (:uuid, :name, :url)"
     _UPDATE_JOB = "update job set uuid=:uuid, name=:name, url=:url where id=:id"
-    _REMOVE_JOB = "delete from job where id=?"
+    _DELETE_JOB = "delete from job where id=?"
     _FIND_JOB_BY_ID = "select id, uuid, name, url from job where id = ?"
     _FIND_JOB_BY_UUID = "select id, uuid, name, url from job where uuid = ?"
     _FIND_ALL_JOBS = "select id, uuid, name, url from job"
-
-    @staticmethod
-    def map_full_row(row: Tuple) -> JobDto:
-        _id, _uuid, _name, _url = row
-        return JobDto(id=_id, uuid=_uuid, name=_name, url=_url)
 
     @staticmethod
     def save(job: JobDto) -> JobDto:
@@ -68,10 +63,41 @@ class JobDao:
             return JobDao._do_update(job)
 
     @staticmethod
+    def delete(job: JobDto) -> None:
+        with sql_commit(JobDao._DELETE_JOB, [job.id]):
+            LOGGER.debug(f"Removed Job with id: {job.id}")
+
+    @staticmethod
+    def find_job_by_id(id: int) -> JobDto:
+        try:
+            with sql_fetch(JobDao._FIND_JOB_BY_ID, [id], row_mapper=JobDao._map_full_row, size=1) as job_dto:
+                return job_dto
+        except FetchOneException:
+            raise NoResultException(f"No Job Found with id: {id}") from None
+
+    @staticmethod
+    def find_job_by_uuid(uuid: str) -> JobDto:
+        try:
+            with sql_fetch(JobDao._FIND_JOB_BY_UUID, [uuid], row_mapper=JobDao._map_full_row, size=1) as job_dto:
+                return job_dto
+        except FetchOneException:
+            raise NoResultException(f"No Job Found with uuid: {uuid}") from None
+
+    @staticmethod
+    def find_jobs() -> List[JobDto]:
+        with sql_fetch(JobDao._FIND_ALL_JOBS, [], row_mapper=JobDao._map_full_row, size=0) as jobs:
+            return jobs
+
+    @staticmethod
+    def _map_full_row(row: Tuple) -> JobDto:
+        _id, _uuid, _name, _url = row
+        return JobDto(id=_id, uuid=_uuid, name=_name, url=_url)
+
+    @staticmethod
     def _do_insert(job: JobDto) -> JobDto:
-        with sql_commit(JobDao._INSERT_NEW_JOB, job.parameterize()) as last_row_id:
+        with sql_commit(JobDao._INSERT_JOB, job.parameterize()) as last_row_id:
             if last_row_id > 0:
-                LOGGER.info(f"Added or replaced job with id: {last_row_id}")
+                LOGGER.debug(f"Added or replaced job with id: {last_row_id}")
                 return JobDao.find_job_by_id(last_row_id)
 
     @staticmethod
@@ -84,32 +110,5 @@ class JobDao:
             url=job.url if job.url is not None else existing_row.url
         )
         with sql_commit(JobDao._UPDATE_JOB, updated_row.parameterize()) as last_row_id:
-            LOGGER.info(f"Updated existing job with id: {existing_row.id}")
+            LOGGER.debug(f"Updated existing job with id: {existing_row.id}")
             return updated_row
-
-    @staticmethod
-    def delete_by_uuid(uuid: str) -> None:
-        job_dto = JobDao.find_job_by_uuid(uuid)
-        with sql_commit(JobDao._REMOVE_JOB, [job_dto.id]):
-            LOGGER.info(f"Removed Job with id: {job_dto.id}")
-
-    @staticmethod
-    def find_job_by_id(id: int) -> JobDto:
-        try:
-            with sql_fetch(JobDao._FIND_JOB_BY_ID, [id], row_mapper=JobDao.map_full_row, size=1) as job_dto:
-                return job_dto
-        except FetchOneException:
-            raise NoResultException(f"No Job Found with id: {id}") from None
-
-    @staticmethod
-    def find_job_by_uuid(uuid: str) -> JobDto:
-        try:
-            with sql_fetch(JobDao._FIND_JOB_BY_UUID, [uuid], row_mapper=JobDao.map_full_row, size=1) as job_dto:
-                return job_dto
-        except FetchOneException:
-            raise NoResultException(f"No Job Found with uuid: {uuid}") from None
-
-    @staticmethod
-    def find_jobs() -> List[JobDto]:
-        with sql_fetch(JobDao._FIND_ALL_JOBS, [], row_mapper=JobDao.map_full_row, size=0) as jobs:
-            return jobs

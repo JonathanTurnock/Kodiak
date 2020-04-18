@@ -18,6 +18,7 @@ def get_connection():
     t0 = time.time()
     try:
         connection = sqlite3.connect(database_path)
+        connection.execute("PRAGMA foreign_keys = 1")
     except sqlite3.OperationalError as e:
         LOGGER.error(f"Unable to Open database connection at {database_path}")
         raise Exception(f"Unable to Open database connection at {database_path}") from e

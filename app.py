@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from os import path
 from pathlib import Path
 
@@ -36,8 +37,12 @@ def web(file):
 
 @app.route('/api/request', methods=['POST'])
 def start():
-    run_uuid = AgentInterface.run_job(str(request.json["uuid"]), str(request.json["name"]), str(request.json["url"]))
-    return jsonify({"uuid": run_uuid})
+    try:
+        run_uuid = AgentInterface.run_job(str(request.json["uuid"]), str(request.json["name"]),
+                                          str(request.json["url"]))
+        return jsonify({"uuid": run_uuid})
+    except Exception as e:
+        return jsonify({"error": str(e)}), HTTPStatus.NOT_FOUND
 
 
 @app.route('/api/health', methods=['GET'])

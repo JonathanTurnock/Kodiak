@@ -84,23 +84,17 @@ class Run:
 class Step:
     def __init__(
             self,
-            run: Run = None,
             number: int = None,
             name: str = None,
             image: str = None,
             status: Status = None,
             commands: List = None
     ):
-        self._run: Run = run
         self._number: int = number
         self._name: str = name
         self._image: str = image
         self._status: Status = status if status is not None else Status.PENDING
         self._commands: List[Command] = commands if commands is not None else []
-
-    @property
-    def run(self) -> Run:
-        return self._run
 
     @property
     def number(self) -> int:
@@ -130,21 +124,15 @@ class Step:
 class Command:
     def __init__(
             self,
-            step: Step = None,
             number: int = None,
             instruction: str = None,
             std_out: List[str] = None,
             std_err: List[str] = None
     ):
-        self._step: Step = step
         self._number: int = number
         self._instruction: str = instruction
         self._std_out: List[str] = std_out if std_out is not None else []
         self._std_err: List[str] = std_err if std_err is not None else []
-
-    @property
-    def step(self) -> Step:
-        return self._step
 
     @property
     def number(self) -> int:

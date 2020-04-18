@@ -104,7 +104,6 @@ class RunTask:
             for s in run_yml["pipelines"]["steps"]:
                 s_no += 1
                 step = Step(
-                    run=self._run,
                     number=s_no,
                     name=s["step"]["name"],
                     image=s["step"]["image"])
@@ -112,7 +111,6 @@ class RunTask:
                 for script_entry in s["step"]["script"]:
                     se_no += 1
                     command = Command(
-                        step=step,
                         number=se_no,
                         instruction=script_entry)
                     step.commands.append(command)

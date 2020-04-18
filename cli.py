@@ -3,7 +3,7 @@ import logging
 from bootstrap import LOGGING_FORMAT
 
 if __name__ == '__main__':
-    logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+    logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)
 
 import click
 

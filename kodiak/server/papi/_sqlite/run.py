@@ -1,24 +1,13 @@
 import logging
 from datetime import datetime
+from sqlite3 import IntegrityError
 from typing import Tuple
 
-from kodiak.model.run import Run
 from kodiak.server.papi._sqlite._interfaces import Dto
 from kodiak.server.papi._sqlite.connection_factory import sql_fetch, FetchOneException, sql_commit
 from kodiak.server.papi.exception import NoResultException
 
 LOGGER = logging.getLogger(__name__)
-
-
-def run_dto_of_run(run: Run):
-    return RunDto(
-        id=run.id,
-        job_id=run.job.id,
-        uuid=run.uuid,
-        status=run.status.name,
-        started=run.started,
-        ended=run.ended
-    )
 
 
 class RunDto(Dto):
@@ -50,34 +39,23 @@ class RunDto(Dto):
 
 
 class RunDao:
-    _INSERT_NEW_RUN = "insert into run (job_id, uuid, status, started, ended) values (?, ?, ?, ?, ?)"
-    _UPDATE_EXISTING_RUN = "update run set job_id=?, uuid=?, status=?, started=?, ended=? where id=?"
+    _INSERT_RUN = "insert into run (job_id, uuid, status, started, ended) values (:job_id, :uuid, :status, :started, :ended)"
+    _DELETE_RUN = "delete from run where id=?"
+    _UPDATE_RUN = "update run set job_id=:job_id, uuid=:uuid, status=:status, started=:started, ended=:ended where id=:id"
     _FIND_BY_ID = "select id, job_id, uuid, status, started, ended from run where id=?"
     _FIND_BY_UUID = "select id, job_id, uuid, status, started, ended from run where uuid=?"
 
     @staticmethod
-    def map_full_row(row: Tuple) -> RunDto:
-        _id, _job_id, _uuid, _status, _started, _ended = row
-        return RunDto(id=_id, job_id=_job_id, uuid=_uuid, status=_status, started=_started, ended=_ended)
-
-    @staticmethod
     def save(run: RunDto) -> RunDto:
-        if run.id is None:
-            with sql_commit(RunDao._INSERT_NEW_RUN,
-                            [run.job_id, run.uuid, run.status, run.started, run.ended]) as last_row_id:
-                run.id = last_row_id
-                LOGGER.info(f"Added new run with with id: {last_row_id}")
-        else:
-            with sql_commit(RunDao._UPDATE_EXISTING_RUN,
-                            [run.job_id, run.uuid, run.status, run.started, run.ended, run.id]) as last_row_id:
-                LOGGER.info(f"Updated run with with id: {last_row_id}")
-
-        return RunDao.find_by_id(run.id)
+        try:
+            return RunDao._do_insert(run)
+        except IntegrityError as e:
+            return RunDao._do_update(run)
 
     @staticmethod
     def find_by_id(id: int) -> RunDto:
         try:
-            with sql_fetch(RunDao._FIND_BY_ID, [id], row_mapper=RunDao.map_full_row, size=1) as run_dto:
+            with sql_fetch(RunDao._FIND_BY_ID, [id], row_mapper=RunDao._map_full_row, size=1) as run_dto:
                 return run_dto
         except FetchOneException:
             raise NoResultException(f"No Run Found with id: {id}") from None
@@ -85,7 +63,38 @@ class RunDao:
     @classmethod
     def find_by_uuid(cls, uuid: str):
         try:
-            with sql_fetch(RunDao._FIND_BY_UUID, [uuid], row_mapper=RunDao.map_full_row, size=1) as run_dto:
+            with sql_fetch(RunDao._FIND_BY_UUID, [uuid], row_mapper=RunDao._map_full_row, size=1) as run_dto:
                 return run_dto
         except FetchOneException:
             raise NoResultException(f"No Run Found with uuid: {uuid}") from None
+
+    @staticmethod
+    def delete(run: RunDto) -> None:
+        with sql_commit(RunDao._DELETE_RUN, [run.id]):
+            LOGGER.debug(f"Removed Run with id: {run.id}")
+
+    @staticmethod
+    def _map_full_row(row: Tuple) -> RunDto:
+        _id, _job_id, _uuid, _status, _started, _ended = row
+        return RunDto(id=_id, job_id=_job_id, uuid=_uuid, status=_status, started=_started, ended=_ended)
+
+    @staticmethod
+    def _do_insert(job: RunDto) -> RunDto:
+        with sql_commit(RunDao._INSERT_RUN, job.parameterize()) as last_row_id:
+            LOGGER.debug(f"Added run with id: {last_row_id}")
+            return RunDao.find_by_id(last_row_id)
+
+    @staticmethod
+    def _do_update(run: RunDto) -> RunDto:
+        existing_row = RunDao.find_by_uuid(run.uuid)
+        updated_row = RunDto(
+            id=existing_row.id,
+            job_id=run.job_id,
+            uuid=existing_row.uuid,
+            status=run.status,
+            started=run.started,
+            ended=run.ended
+        )
+        with sql_commit(RunDao._UPDATE_RUN, updated_row.parameterize()) as last_row_id:
+            LOGGER.debug(f"Updated existing run with id: {existing_row.id}")
+            return updated_row
